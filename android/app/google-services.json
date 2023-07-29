@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "540944041311",
+    "project_id": "jpope-83a08",
+    "storage_bucket": "jpope-83a08.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:540944041311:android:388a9c1daf478ceec5e2ea",
+        "android_client_info": {
+          "package_name": "com.tozhar.jpope"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "540944041311-kkivv42h8f0l9brem6e5r776eh26e7f7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4jImv0DfJMy2Uu8pJSiIFu3e_tqkmOKc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "540944041311-kkivv42h8f0l9brem6e5r776eh26e7f7.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "540944041311-9l7e7esjrc490jksm9k8r1rrs5r0ds7a.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.tozhar.jpope"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
