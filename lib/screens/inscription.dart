@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'Authentification.dart';
+
 class Inscription extends StatefulWidget {
   const Inscription({Key? key}) : super(key: key);
 
@@ -14,100 +16,122 @@ class _InscriptionState extends State<Inscription> {
     return Container(
       child: Scaffold(
         appBar: AppBar(
-          title: Text("S'inscrire"),
-          actions: <Widget>[
-            TextButton.icon(
-              icon: Icon(Icons.person, color: Colors.white),
-              label: Text(
-                "S'inscrire",
-                style: TextStyle(color: Colors.white),
-              ),
-              onPressed: () {
-                // Ajoutez ici le code à exécuter lorsque le bouton est pressé
-              },
-            )
-          ],
+          title: Text("Inscription"),
         ),
         body: Form(
           child: SingleChildScrollView(
             child: Column(
-              children: [
-                Container(
-                  margin: EdgeInsets.only(top: 50, left: 80),
-                  child: ListTile(
-                    leading: Icon(
-                      Icons.person,
-                      size: 200,
+              children: <Widget>[
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(100),
+                  child: Image.asset('assets/images/lg.png',
+                    height: 200, width: 200,
                     ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => Inscription()),
-                      );
-                    },
-                  ),
                 ),
-                SizedBox(height: 200),
-                TextFormField(
-                  decoration: InputDecoration(
-                    hintText: "Entre Votre email",
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Complétez le texte";
-                    }
-                    return null;
-                  },
+                Center(
+                  child: Text("Créer un compte",
+                  style: TextStyle(
+                    fontSize: 25,
+                  ),),
                 ),
-                SizedBox(height: 200),
-                TextFormField(
-                  decoration: InputDecoration(
-                    hintText: "Entre Votre email",
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Complétez le texte";
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 200),
-                TextFormField(
-                  decoration: InputDecoration(
-                    hintText: "Entre Votre email",
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Complétez le texte";
-                    }
-                    return null;
-                  },
-                ),
+
                 SizedBox(height: 50),
                 TextFormField(
                   decoration: InputDecoration(
-                    hintText: "Entre votre mot de passe",
-                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.person_3),
+                    hintText: "Nom d'utilisateur",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25.0),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+
                   ),
                   validator: (value) {
-                    if (value == null || value.isEmpty || value.length < 6) {
-                      return "Le mot de passe doit contenir au moins 6 caractères";
+                    if (value == null || value.isEmpty) {
+                      return "Complétez le texte";
                     }
                     return null;
                   },
                 ),
+                SizedBox(height: 40),
+                TextFormField(
+                  decoration: InputDecoration(
+                    hintText: "Entre Votre email",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25.0),
+                    ),
+                    prefixIcon: Icon(Icons.email),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Complétez le texte";
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 40),
+                Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.5), // Couleur de l'ombre
+                        spreadRadius: 5, // Augmenter cette valeur pour déplacer l'ombre vers l'extérieur
+                        blurRadius: 5, // Flou de l'ombre
+                        offset: Offset(0, 5), // Décalage de l'ombre (horizontal, vertical)
+                      ),
+                    ],
+                    borderRadius: BorderRadius.circular(25.0),
+                  ),
+                  child: TextFormField(
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.lock),
+                      hintText: "Entre votre mot de passe",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25.0),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty || value.length < 6) {
+                        return "Le mot de passe doit contenir au moins 6 caractères";
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+
+
                 SizedBox(height: 30),
                 SizedBox(
-                  width: 150,
+                  width: 200,
                   height: 40,
                   child: ElevatedButton(
                     onPressed: () async {
                       // Utilisez la méthode de navigation ici
                     },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25.0), // Ajuster la valeur du rayon selon vos préférences
+                      ),
+
+                    ),
                     child: Text("S'inscrire"),
+                  ),
+                ),
+                Text("Vous avez un compte ? ",),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Authentification()),
+                    );
+                  },
+                    child: Text(
+                    'Se connecter',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                      fontSize: 15,
+                    ),
                   ),
                 ),
               ],
