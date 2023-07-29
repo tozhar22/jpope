@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:jpope/screens/LoadingPage.dart';
 import 'package:jpope/screens/inscription.dart';
 
 
