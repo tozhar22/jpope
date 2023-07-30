@@ -15,19 +15,20 @@ class _InscriptionState extends State<Inscription> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Inscription"),
-      ),
       body: Form(
         child: SingleChildScrollView(
+
           child: Column(
             children: <Widget>[
-              ClipRRect(
-                borderRadius: BorderRadius.circular(100),
-                child: Image.asset(
-                  'assets/images/log.png',
-                  height: 150,
-                  width: 150,
+              Container(
+                margin: EdgeInsets.only(top: 50),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(100),
+                  child: Image.asset(
+                    'assets/images/log.png',
+                    height: 150,
+                    width: 150,
+                  ),
                 ),
               ),
               Center(
@@ -96,23 +97,26 @@ class _InscriptionState extends State<Inscription> {
                 ),
               ),
 
-              SizedBox(height: 30),
-              SizedBox(
-                width: 200,
-                height: 40,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    // Utilisez la méthode de navigation ici
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25.0), // Ajuster la valeur du rayon selon vos préférences
+              Container(
+                margin: EdgeInsets.only(top: 25, bottom: 10),
+                child: SizedBox(
+                  width: 200,
+                  height: 40,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      // Utilisez la méthode de navigation ici
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25.0), // Ajuster la valeur du rayon selon vos préférences
+                      ),
                     ),
+                    child: Text("S'INSCRIRE"),
                   ),
-                  child: Text("S'inscrire"),
                 ),
               ),
               Text("Vous avez un compte ?"),
+              SizedBox(height:8),
               GestureDetector(
                 onTap: () {
                   Navigator.push(
