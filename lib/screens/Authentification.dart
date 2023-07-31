@@ -18,7 +18,7 @@ class _AuthentificationState extends State<Authentification> {
           child: Column(
             children: <Widget>[
               Container(
-                margin: EdgeInsets.only(top: 50),
+                margin: EdgeInsets.only(top: 110, bottom: 10),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(100),
                   child: Image.asset(
@@ -102,7 +102,7 @@ class _AuthentificationState extends State<Authentification> {
                   );
                 },
                 child: Text(
-                  "S'inscrire",
+                  "S'INSCRIRE",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.blue,

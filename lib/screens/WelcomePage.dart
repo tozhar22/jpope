@@ -3,11 +3,12 @@
 import 'dart:async';
 
 import 'package:animate_do/animate_do.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:page_view_indicators/circle_page_indicator.dart';
+
+import 'inscription.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({Key? key});
@@ -139,7 +140,12 @@ class _WelcomePageState extends State<WelcomePage> {
             SizedBox(height: 40,),
             BounceInDown(
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Inscription()),
+                  );
+                },
                 child: Text(
                   "S'incrire gratuitement",
                   style: TextStyle(fontSize: 18),

@@ -1,6 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:jpope/services/Authentication.dart';
 
+import '../models/user.dart';
 import 'Authentification.dart';
+
+
 
 
 class Inscription extends StatefulWidget {
@@ -11,17 +17,106 @@ class Inscription extends StatefulWidget {
 }
 
 class _InscriptionState extends State<Inscription> {
+  final AuthenticationService _auth = AuthenticationService();
+  final _formKey = GlobalKey<FormState>();
+  final userNameController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  _showSuccessDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return const AlertDialog(
+          title: Text('Connexion réussie'),
+          content: Text('Félicitations ! Votre connexion s\'est bien déroulée.'),
+        );
+      },
+    ).then((_) {
+      // Ferme automatiquement la boîte de dialogue après 1 seconde.
+      Future.delayed(Duration(seconds: 1), () {
+        Navigator.of(context).pop(); // Ferme automatiquement la boîte de dialogue.
+      });
+    });
+  }
+
+  _showUserNotFound(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Compte introuvable'),
+          content: Text('Aucun compte n\'est associé à cet e-mail. Veuillez vous inscrire avant de vous connecter.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Fermer'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  _showNetworkError(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Problème de connexion'),
+          content: Text('Pas de connexion.Veuillez réessayer plus tard'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Fermer'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  _showErroDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Identifiants incorrects'),
+          content: Text('Nom d’utilisateur ou mot de passe incorrect'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Fermer'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    userNameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Form(
+        key: _formKey,
         child: SingleChildScrollView(
 
           child: Column(
             children: <Widget>[
               Container(
-                margin: EdgeInsets.only(top: 50),
+                margin: EdgeInsets.only(top: 60),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(100),
                   child: Image.asset(
@@ -36,6 +131,7 @@ class _InscriptionState extends State<Inscription> {
                   "Créer un compte",
                   style: TextStyle(
                     fontSize: 25,
+                    fontWeight: FontWeight.bold
                   ),
                 ),
               ),
@@ -44,6 +140,7 @@ class _InscriptionState extends State<Inscription> {
               Container(
                 margin: EdgeInsets.all(20),
                 child: TextFormField(
+                  controller: userNameController,
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.person_3),
                     hintText: "Nom d'utilisateur",
@@ -63,6 +160,7 @@ class _InscriptionState extends State<Inscription> {
               Container(
                 margin: EdgeInsets.all(20),
                 child: TextFormField(
+                  controller: emailController,
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.email),
                     hintText: "Entre Votre email",
@@ -81,6 +179,7 @@ class _InscriptionState extends State<Inscription> {
               Container(
                 margin: EdgeInsets.all(20),
                 child: TextFormField(
+                  controller: passwordController,
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.lock),
                     hintText: "Entre votre mot de passe",
@@ -104,7 +203,49 @@ class _InscriptionState extends State<Inscription> {
                   height: 40,
                   child: ElevatedButton(
                     onPressed: () async {
-                      // Utilisez la méthode de navigation ici
+                      if (_formKey.currentState!.validate()) {
+                        String userName = userNameController.text;
+                        String email = emailController.text;
+                        String password = passwordController.text;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Inscription en cours...")),
+                        );
+
+                        CollectionReference userRef = FirebaseFirestore.instance.collection("User");
+                        userRef.add({
+                          'mail': email,
+                          'password': password,
+                          'username': userName,
+                        });
+
+                        try {
+                          AppUser? result = await _auth.registerWithEmailAndPassword(email, password);
+                          if (result != null) {
+                            // L'inscription a réussi, vous pouvez effectuer des actions supplémentaires ici
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Inscription réussie !")),
+                            );
+                          } else {
+                            // L'inscription a échoué, vous pouvez afficher un message d'erreur ici
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Échec de l'inscription. Veuillez réessayer.")),
+                            );
+                          }
+                        } on FirebaseAuthException catch (e) {
+                          // Gérer les erreurs d'authentification
+                          if (e.code == 'user-not-found') {
+                            print('Compte introuvable : ${e.message}');
+                            _formKey.currentState?.reset();
+                            _showUserNotFound(context);
+                          } else if (e.code == 'wrong-password' || e.code == 'invalid-email') {
+                            _showErroDialog(context);
+                          } else if (e.code == 'network-request-failed') {
+                            _showNetworkError(context);
+                          }
+                        } catch (e) {
+                          print('Erreur d\'authentification : $e');
+                        }
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
@@ -113,6 +254,7 @@ class _InscriptionState extends State<Inscription> {
                     ),
                     child: Text("S'INSCRIRE"),
                   ),
+
                 ),
               ),
               Text("Vous avez un compte ?"),
@@ -125,7 +267,7 @@ class _InscriptionState extends State<Inscription> {
                   );
                 },
                 child: Text(
-                  'Se connecter',
+                  'SE CONNECTER',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.blue,
