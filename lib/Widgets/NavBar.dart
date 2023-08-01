@@ -59,6 +59,7 @@ class NavBar extends StatelessWidget {
               ),
               onTap: () {
                 AuthenticationService().signOut();
+
               },
             )
           ],

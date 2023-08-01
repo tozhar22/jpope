@@ -6,6 +6,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:jpope/screens/Authentification.dart';
 import 'package:page_view_indicators/circle_page_indicator.dart';
 
 import 'inscription.dart';
@@ -159,7 +160,12 @@ class _WelcomePageState extends State<WelcomePage> {
               ),
             ),
             ElevatedButton(
-              onPressed:(){},
+              onPressed:(){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Authentification()),
+                );
+              },
               child: Text(
                 "Vous avez un compte ? Connectez-vous",
                 style: TextStyle(

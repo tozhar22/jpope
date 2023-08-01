@@ -170,18 +170,18 @@ _showErroDialog(BuildContext context) {
                   child: ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                      String email = emailController.text;
-                      String password = passwordController.text;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Connexion en cours...")),
-                      );
+                        String email = emailController.text;
+                        String password = passwordController.text;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Connexion en cours...")),
+                        );
                       try {
                       AppUser? result = await _auth.signInWithEmailAndPassword(email, password);
                       if (result != null) {
-                        await _showSuccessDialog(context);
+
                       Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => ApplicationInterface()), // Remplacez 'HomePage' par le nom de votre page
+                        context,
+                        MaterialPageRoute(builder: (context) => ApplicationInterface()), // Remplacez 'HomePage' par le nom de votre page
                       );
 
                       } else {
