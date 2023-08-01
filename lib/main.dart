@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
 import 'models/SplashScreenWrapper.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 void main() async {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: Colors.transparent));
   WidgetsFlutterBinding.ensureInitialized();
