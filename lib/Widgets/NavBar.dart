@@ -1,9 +1,10 @@
 
 import 'package:flutter/material.dart';
+import 'package:jpope/services/FirebaseAuthServices.dart';
+
 
 class NavBar extends StatelessWidget {
-  const NavBar({super.key});
-
+   const NavBar({super.key});
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -56,7 +57,9 @@ class NavBar extends StatelessWidget {
                     fontSize: 16
                 ),
               ),
-              onTap: () => null,
+              onTap: () {
+                AuthenticationService().signOut();
+              },
             )
           ],
         ),

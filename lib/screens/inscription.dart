@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:jpope/services/Authentication.dart';
+import 'package:jpope/screens/ApplicationInterface.dart';
+import 'package:jpope/services/FirebaseAuthServices.dart';
 
 import '../models/user.dart';
 import 'Authentification.dart';
@@ -17,7 +18,9 @@ class Inscription extends StatefulWidget {
 }
 
 class _InscriptionState extends State<Inscription> {
+
   final AuthenticationService _auth = AuthenticationService();
+
   final _formKey = GlobalKey<FormState>();
   final userNameController = TextEditingController();
   final emailController = TextEditingController();
@@ -130,8 +133,8 @@ class _InscriptionState extends State<Inscription> {
                 child: Text(
                   "Créer un compte",
                   style: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold
                   ),
                 ),
               ),
@@ -203,10 +206,14 @@ class _InscriptionState extends State<Inscription> {
                   height: 40,
                   child: ElevatedButton(
                     onPressed: () async {
+
                       if (_formKey.currentState!.validate()) {
+
                         String userName = userNameController.text;
                         String email = emailController.text;
                         String password = passwordController.text;
+
+
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text("Inscription en cours...")),
                         );
@@ -218,13 +225,21 @@ class _InscriptionState extends State<Inscription> {
                           'userName': userName,
                         });
 
+                        // Appelle de la méthode d'inscription depuis la class d'authentification
                         try {
                           AppUser? result = await _auth.registerWithEmailAndPassword(email, password);
+
                           if (result != null) {
                             // L'inscription a réussi, vous pouvez effectuer des actions supplémentaires ici
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text("Inscription réussie !")),
                             );
+
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => ApplicationInterface()), // Remplacez 'HomePage' par le nom de votre page
+                            );
+
                           } else {
                             // L'inscription a échoué, vous pouvez afficher un message d'erreur ici
                             ScaffoldMessenger.of(context).showSnackBar(
