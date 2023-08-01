@@ -10,6 +10,19 @@ class PageEvenement extends StatefulWidget {
 class _PageEvenementState extends State<PageEvenement> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          FloatingActionButton(
+              onPressed: null,
+              child: Icon(
+                Icons.add,
+              ),
+          )
+        ],
+      ),
+    );
   }
 }

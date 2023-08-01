@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:jpope/models/user.dart';
 import 'package:jpope/screens/ApplicationInterface.dart';
-import 'package:jpope/screens/Authentification.dart';
+import 'package:jpope/screens/WelcomePage.dart';
 
 import 'package:provider/provider.dart';
 
@@ -13,7 +13,7 @@ class SplashScreenWrapper extends StatelessWidget {
     final user = Provider.of<AppUser?>(context);
 
     if (user == null) {
-      return Authentification();
+      return WelcomePage();
     } else {
       return ApplicationInterface();
     }

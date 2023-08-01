@@ -170,18 +170,18 @@ _showErroDialog(BuildContext context) {
                   child: ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                      String email = emailController.text;
-                      String password = passwordController.text;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Connexion en cours...")),
-                      );
+                        String email = emailController.text;
+                        String password = passwordController.text;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Connexion en cours...")),
+                        );
                       try {
                       AppUser? result = await _auth.signInWithEmailAndPassword(email, password);
                       if (result != null) {
-                        await _showSuccessDialog(context);
+
                       Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => ApplicationInterface()), // Remplacez 'HomePage' par le nom de votre page
+                        context,
+                        MaterialPageRoute(builder: (context) => ApplicationInterface()), // Remplacez 'HomePage' par le nom de votre page
                       );
 
                       } else {
@@ -190,19 +190,23 @@ _showErroDialog(BuildContext context) {
                       const SnackBar(content: Text("Échec de la connexion. Veuillez réessayer.")),
                       );
                       }
+                      // les erreurs possible lier à fireBase
                       } on FirebaseAuthException catch (e) {
                       // Gérer les erreurs d'authentification
+
                       if (e.code == 'user-not-found') {
-                      print('Compte introuvable : ${e.message}');
-                      _formKey.currentState?.reset();
-                      _showUserNotFound(context);
-                      } else if (e.code == 'wrong-password' || e.code == 'invalid-email') {
-                      _showErroDialog(context);
-                      } else if (e.code == 'network-request-failed') {
-                      _showNetworkError(context);
+                        print('Compte introuvable : ${e.message}');
+                        _formKey.currentState?.reset();
+                        _showUserNotFound(context);
+                      }
+                      else if (e.code == 'wrong-password' || e.code == 'invalid-email') {
+                           _showErroDialog(context);
+                      }
+                      else if (e.code == 'network-request-failed') {
+                          _showNetworkError(context);
                       }
                       } catch (e) {
-                      print('Erreur d\'authentification : $e');
+                          print('Erreur d\'authentification : $e');
                       }
                       }
                       },
