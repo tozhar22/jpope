@@ -43,6 +43,7 @@ dependencies:
   salomon_bottom_bar: ^3.3.2
   firebase_auth: ^4.7.2
   cloud_firestore: ^4.8.4
+  provider: ^5.0.0
 
 flutter_native_splash:
   color: "#ffffff"
@@ -53,6 +54,7 @@ flutter_native_splash:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

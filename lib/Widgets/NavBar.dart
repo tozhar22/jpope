@@ -56,7 +56,7 @@ class NavBar extends StatelessWidget {
                     fontSize: 16
                 ),
               ),
-              onTap: () => null,
+
             )
           ],
         ),

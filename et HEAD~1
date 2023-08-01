@@ -1,0 +1,53 @@
+[33mcommit b5babaea05e34c1e2efb8a93a1ce3385cd2aa515[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: AzharTCHATCHIBARA <tozhar22@gmail.com>
+Date:   Mon Jul 31 20:10:51 2023 +0000
+
+    inscription
+
+[33mcommit 5cd33fbc4db3b9ae5c8c12f04a99f274f1b47a27[m
+Author: josias ASSIH <josiasassih4@gmail.com>
+Date:   Mon Jul 31 10:03:04 2023 +0000
+
+    add welcome page & loadling
+
+[33mcommit b992b947c51b63607c84734ec915b7030b8dca9f[m
+Author: AzharTCHATCHIBARA <tozhar22@gmail.com>
+Date:   Sun Jul 30 17:43:41 2023 +0000
+
+    logo
+
+[33mcommit 25a46b6ef105e71bc2a71a9005d2d578faa2e9eb[m
+Author: AzharTCHATCHIBARA <tozhar22@gmail.com>
+Date:   Sun Jul 30 17:43:11 2023 +0000
+
+    auth
+
+[33mcommit 5dfaf52009ed9bc4ef511da1615164fb7b53db7a[m
+Author: AzharTCHATCHIBARA <tozhar22@gmail.com>
+Date:   Sat Jul 29 20:57:26 2023 +0000
+
+    auth
+
+[33mcommit a910a433b1e9c75b1dc058b8e1b0479dfc7711c2[m
+Author: AzharTCHATCHIBARA <tozhar22@gmail.com>
+Date:   Sat Jul 29 17:21:49 2023 +0000
+
+    inscription
+
+[33mcommit c971a7de588c88d1989ade6360344eb627da982a[m
+Author: AzharTCHATCHIBARA <tozhar22@gmail.com>
+Date:   Sat Jul 29 14:30:39 2023 +0000
+
+    inscription
+
+[33mcommit b2a7c223ae9fa43ee3b1dfc446551848d63d9ae6[m
+Author: josias ASSIH <josiasassih4@gmail.com>
+Date:   Sat Jul 29 12:01:03 2023 +0000
+
+    add LoadingPage.dart
+
+[33mcommit 1ef1292bacc2fe5824d7a1225183be590a87f822[m
+Author: josias ASSIH <josiasassih4@gmail.com>
+Date:   Fri Jul 28 11:42:47 2023 +0000
+
+    Initial commit

@@ -1,15 +1,16 @@
+// Authentication.dart
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:jpope/models/user.dart';
 
 class AuthenticationService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  AppUser? _userFromFirebaseUser(User user) {
+  AppUser? _userFromFirebaseUser(User? user) { // Use User? instead of User
     return user != null ? AppUser(uid: user.uid) : null;
   }
 
   Stream<AppUser?> get user {
-    return _auth.authStateChanges().map((User? user) => _userFromFirebaseUser(user!));
+    return _auth.authStateChanges().map((User? user) => _userFromFirebaseUser(user));
   }
 
   Future<AppUser?> signInWithEmailAndPassword(String email, String password) async {
@@ -19,7 +20,7 @@ class AuthenticationService {
         password: password,
       );
       User? user = result.user;
-      return _userFromFirebaseUser(user!);
+      return _userFromFirebaseUser(user);
     } catch (exception) {
       print(exception.toString());
       return null;
@@ -33,7 +34,7 @@ class AuthenticationService {
         password: password,
       );
       User? user = result.user;
-      return _userFromFirebaseUser(user!);
+      return _userFromFirebaseUser(user);
     } catch (exception) {
       print(exception.toString());
       return null;

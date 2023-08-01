@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:jpope/screens/ApplicationInterface.dart';
 import 'package:jpope/services/Authentication.dart';
 
 import '../models/user.dart';
@@ -130,8 +131,8 @@ class _InscriptionState extends State<Inscription> {
                 child: Text(
                   "Créer un compte",
                   style: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold
                   ),
                 ),
               ),
@@ -225,6 +226,11 @@ class _InscriptionState extends State<Inscription> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text("Inscription réussie !")),
                             );
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => ApplicationInterface()), // Remplacez 'HomePage' par le nom de votre page
+                            );
+
                           } else {
                             // L'inscription a échoué, vous pouvez afficher un message d'erreur ici
                             ScaffoldMessenger.of(context).showSnackBar(
