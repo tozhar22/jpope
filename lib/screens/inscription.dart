@@ -215,7 +215,7 @@ class _InscriptionState extends State<Inscription> {
                         userRef.add({
                           'mail': email,
                           'password': password,
-                          'username': userName,
+                          'userName': userName,
                         });
 
                         try {
