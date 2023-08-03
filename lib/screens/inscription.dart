@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:jpope/screens/ApplicationInterface.dart';
 import 'package:jpope/services/FirebaseAuthServices.dart';
@@ -245,17 +244,6 @@ class _InscriptionState extends State<Inscription> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text("Échec de l'inscription. Veuillez réessayer.")),
                             );
-                          }
-                        } on FirebaseAuthException catch (e) {
-                          // Gérer les erreurs d'authentification
-                          if (e.code == 'user-not-found') {
-                            print('Compte introuvable : ${e.message}');
-                            _formKey.currentState?.reset();
-                            _showUserNotFound(context);
-                          } else if (e.code == 'wrong-password' || e.code == 'invalid-email') {
-                            _showErroDialog(context);
-                          } else if (e.code == 'network-request-failed') {
-                            _showNetworkError(context);
                           }
                         } catch (e) {
                           print('Erreur d\'authentification : $e');

@@ -176,37 +176,33 @@ _showErroDialog(BuildContext context) {
                         const SnackBar(content: Text("Connexion en cours...")),
                         );
                       try {
-                      AppUser? result = await _auth.signInWithEmailAndPassword(email, password);
+                      AppUser? result = await _auth.signInWithEmailAndPassword(context, email, password);
                       if (result != null) {
 
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(builder: (context) => ApplicationInterface()), // Remplacez 'HomePage' par le nom de votre page
                       );
-
-                      } else {
-                      // L'inscription a échoué, vous pouvez afficher un message d'erreur ici
-                      ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Échec de la connexion. Veuillez réessayer.")),
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Connexion réussie'),
+                            content: Text('Vous êtes maintenant connecté.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('Fermer'),
+                              ),
+                            ],
+                          );
+                        },
                       );
                       }
-                      // les erreurs possible lier à fireBase
-                      } on FirebaseAuthException catch (e) {
-                      // Gérer les erreurs d'authentification
-
-                      if (e.code == 'user-not-found') {
-                        print('Compte introuvable : ${e.message}');
-                        _formKey.currentState?.reset();
-                        _showUserNotFound(context);
-                      }
-                      else if (e.code == 'wrong-password' || e.code == 'invalid-email') {
-                           _showErroDialog(context);
-                      }
-                      else if (e.code == 'network-request-failed') {
-                          _showNetworkError(context);
-                      }
-                      } catch (e) {
-                          print('Erreur d\'authentification : $e');
+                      }catch (e) {
+                      print('Erreur d\'authentification : $e');
                       }
                       }
                       },
