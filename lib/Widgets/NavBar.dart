@@ -1,6 +1,5 @@
 
 import 'package:flutter/material.dart';
-import 'package:jpope/screens/WelcomePage.dart';
 import 'package:jpope/services/FirebaseAuthServices.dart';
 
 
@@ -59,17 +58,7 @@ class NavBar extends StatelessWidget {
                 ),
               ),
               onTap: () {
-                try{
-                  AuthenticationService().signOut();
-                  Navigator.pushReplacement(
-                      context,
-                      PageRouteBuilder(pageBuilder: (_,__,___) => WelcomePage() )
-                  );
-                }
-                catch(e){
-                      print('Erreur lors de la deconnexion');
-                }
-
+                AuthenticationService().signOut();
               },
             )
           ],
