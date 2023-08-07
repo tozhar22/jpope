@@ -10,7 +10,8 @@ import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 
 class ApplicationInterface extends StatefulWidget {
-  const ApplicationInterface({super.key});
+  ApplicationInterface({Key? key,}) : super(key: key);
+
 
   @override
   State<ApplicationInterface> createState() => _ApplicationInterfaceState();
@@ -21,6 +22,8 @@ class _ApplicationInterfaceState extends State<ApplicationInterface> {
 
   final PageController _pageController = PageController(initialPage: 0);
   int _currentIndex = 0;
+
+
 
   // création d'une méthode qui se chargera de changer le numero de la variable
 
@@ -52,7 +55,7 @@ class _ApplicationInterfaceState extends State<ApplicationInterface> {
     return MaterialApp(
 
       home: Scaffold(
-        drawer: NavBar(),
+        drawer: NavBar(), // Use the correct syntax here
         appBar: AppBar(
           title: const Text(
             "EventPlan",
@@ -69,9 +72,8 @@ class _ApplicationInterfaceState extends State<ApplicationInterface> {
                 Icons.notifications,
                 color: Colors.white,
               ),
-              onPressed: () {  },
+              onPressed: () {},
             ),
-
           ],
           backgroundColor: Colors.blueAccent,
         ),
@@ -79,10 +81,10 @@ class _ApplicationInterfaceState extends State<ApplicationInterface> {
           controller: _pageController,
           onPageChanged: setCurrentIndex,
           children: const [
-              Accueil(),
-              PageEvenement(),
-              Planning(),
-              Search()
+            Accueil(),
+            PageEvenement(),
+            Planning(),
+            Search()
           ],
         ),
         bottomNavigationBar: SalomonBottomBar(
@@ -114,8 +116,7 @@ class _ApplicationInterfaceState extends State<ApplicationInterface> {
             ),
           ],
         ),
-
-      )
+      ),
     );
   }
 }

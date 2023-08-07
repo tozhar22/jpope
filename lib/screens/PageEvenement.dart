@@ -1,4 +1,6 @@
+
 import 'package:flutter/material.dart';
+import 'package:jpope/screens/AjoutEvenement.dart';
 
 class PageEvenement extends StatefulWidget {
   const PageEvenement({super.key});
@@ -8,21 +10,18 @@ class PageEvenement extends StatefulWidget {
 }
 
 class _PageEvenementState extends State<PageEvenement> {
+  
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          FloatingActionButton(
-              onPressed: null,
-              child: Icon(
-                Icons.add,
-              ),
-          )
-        ],
-      ),
+    return  Scaffold(
+      body: Column(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: ()=> Navigator.push(
+          context,
+          PageRouteBuilder(pageBuilder: (_,__,___) =>AddEvent())
+        ),
+        child: Icon(Icons.add),
+      ), //
     );
   }
 }

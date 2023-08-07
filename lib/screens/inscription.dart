@@ -12,7 +12,6 @@ import 'Authentification.dart';
 
 class Inscription extends StatefulWidget {
   const Inscription({Key? key}) : super(key: key);
-
   @override
   State<Inscription> createState() => _InscriptionState();
 }
@@ -129,7 +128,7 @@ class _InscriptionState extends State<Inscription> {
                   ),
                 ),
               ),
-              Center(
+              const Center(
                 child: Text(
                   "Créer un compte",
                   style: TextStyle(
@@ -139,18 +138,18 @@ class _InscriptionState extends State<Inscription> {
                 ),
               ),
 
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Container(
-                margin: EdgeInsets.all(20),
+                margin: const EdgeInsets.all(20),
                 child: TextFormField(
                   controller: userNameController,
                   decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.person_3),
+                    prefixIcon: const Icon(Icons.person_3),
                     hintText: "Nom d'utilisateur",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(25.0),
                     ),
-                    contentPadding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -218,22 +217,27 @@ class _InscriptionState extends State<Inscription> {
                           const SnackBar(content: Text("Inscription en cours...")),
                         );
 
-                        CollectionReference userRef = FirebaseFirestore.instance.collection("User");
-                        userRef.add({
-                          'mail': email,
-                          'password': password,
-                          'userName': userName,
-                        });
-
                         // Appelle de la méthode d'inscription depuis la class d'authentification
-                        try {
-                          AppUser? result = await _auth.registerWithEmailAndPassword(email, password);
+
+                          try {
+
+                            AppUser? result = await _auth.registerWithEmailAndPassword(email, password);
 
                           if (result != null) {
                             // L'inscription a réussi, vous pouvez effectuer des actions supplémentaires ici
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text("Inscription réussie !")),
                             );
+
+                            String userId = result.uid;
+
+                            CollectionReference userRef = FirebaseFirestore.instance.collection("User");
+                            userRef.doc(userId).set({ // Utiliser l'ID de l'utilisateur comme ID du document dans Firestore
+                              'mail': email,
+                              'userName': userName,
+                              'password' : password,
+                              'URL_image' : null
+                            });
 
                             Navigator.pushReplacement(
                               context,

@@ -1,18 +1,14 @@
-
-
 import 'dart:async';
-
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:jpope/screens/Authentification.dart';
 import 'package:page_view_indicators/circle_page_indicator.dart';
-
 import 'inscription.dart';
 
 class WelcomePage extends StatefulWidget {
-  const WelcomePage({Key? key});
+  const WelcomePage({Key? key}) : super(key: key);
 
   @override
   State<WelcomePage> createState() => _WelcomePageState();
@@ -171,14 +167,11 @@ class _WelcomePageState extends State<WelcomePage> {
                 style: TextStyle(
                     color:  Colors.grey,
                     fontSize: 15
-
                 ),
               ),
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all(Colors.transparent),
                 elevation: MaterialStateProperty.all(0),
-
-
               ),
             )
           ],

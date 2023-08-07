@@ -14,8 +14,12 @@ class AuthenticationService {
   Stream<AppUser?> get user {
     return _auth.authStateChanges().map((User? user) => _userFromFirebaseUser(user));
   }
+  // Récupère l'id de l'utilisateur connecter
+  String getCurrentUserId() {
+    User? currentUser = _auth.currentUser;
+    return currentUser?.uid ?? ''; // Utilisation d'une valeur par défaut (chaîne vide) si currentUser est null
+  }
   // Méthode d'inscription
-
   Future<AppUser?> signInWithEmailAndPassword(String email, String password) async {
     try {
       UserCredential result = await _auth.signInWithEmailAndPassword(

@@ -44,6 +44,13 @@ dependencies:
   firebase_auth: ^4.7.2
   cloud_firestore: ^4.8.4
   provider: ^5.0.0
+  image_picker: ^1.0.1
+  path_provider: ^2.0.15
+  date_field: ^3.0.5
+  firebase_storage: ^11.2.5
+  sn_progress_dialog: ^1.1.3
+
+
 
 
 
