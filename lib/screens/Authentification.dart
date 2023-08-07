@@ -16,86 +16,84 @@ class Authentification extends StatefulWidget {
 
 class _AuthentificationState extends State<Authentification> {
   final AuthenticationService _auth = AuthenticationService();
-  final _formKey = GlobalKey<FormState>(); // Adding the key for the Form widget
+  final _formKey = GlobalKey<FormState>(); // Ajout de la clé pour le widget Form
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  _showSuccessDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return const AlertDialog(
-          title: Text('Connexion réussie'),
-          content: Text('Félicitations ! Votre connexion s\'est bien déroulée.'),
-        );
-      },
-    ).then((_) {
-      // Automatically close the dialog after 1 second.
-      Future.delayed(Duration(milliseconds: 1000), () {
-        Navigator.of(context).pop(); // Automatically close the dialog.
-      });
+_showSuccessDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return const AlertDialog(
+        title: Text('Connexion réussie'),
+        content: Text('Félicitations ! Votre connexion s\'est bien déroulée.'),
+      );
+    },
+  ).then((_) {
+    // Ferme automatiquement la boîte de dialogue après 1 seconde.
+    Future.delayed(Duration(milliseconds: 8), () {
+      Navigator.of(context).pop(); // Ferme automatiquement la boîte de dialogue.
     });
-  }
+  });
+}
 
-  _showUserNotFound(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Compte introuvable'),
-          content: Text('Aucun compte n\'est associé à cet e-mail. Veuillez vous inscrire avant de vous connecter.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Fermer'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  _showNetworkError(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Problème de connexion'),
-          content: Text('Pas de connexion. Veuillez réessayer plus tard'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Fermer'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  _showErroDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Identifiants incorrects'),
-          content: Text('Nom d’utilisateur ou mot de passe incorrect'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Fermer'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+_showUserNotFound(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Compte introuvable'),
+        content: Text('Aucun compte n\'est associé à cet e-mail. Veuillez vous inscrire avant de vous connecter.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Fermer'),
+          ),
+        ],
+      );
+    },
+  );
+}
+_showNetworkError(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Problème de connexion'),
+        content: Text('Pas de connexion.Veuillez réessayer plus tard'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Fermer'),
+          ),
+        ],
+      );
+    },
+  );
+}
+_showErroDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Identifiants incorrects'),
+        content: Text('Nom d’utilisateur ou mot de passe incorrect'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Fermer'),
+          ),
+        ],
+      );
+    },
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -175,40 +173,46 @@ class _AuthentificationState extends State<Authentification> {
                         String email = emailController.text;
                         String password = passwordController.text;
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Connexion en cours...")),
+                        const SnackBar(content: Text("Connexion en cours...")),
                         );
+                      try {
+                      AppUser? result = await _auth.signInWithEmailAndPassword(email, password);
+                      if (result != null) {
 
-                        try {
-                          AppUser? result = await _auth.signInWithEmailAndPassword(email, password);
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => ApplicationInterface()), // Remplacez 'HomePage' par le nom de votre page
+                      );
 
-                          if (result != null) {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (context) => ApplicationInterface()),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Échec de la connexion. Veuillez réessayer.")),
-                            );
-                          }
-                        } on FirebaseAuthException catch (e) {
-                          if (e.code == 'user-not-found') {
-                            print('Compte introuvable : ${e.message}');
-                            _formKey.currentState?.reset();
-                            _showUserNotFound(context);
-                          } else if (e.code == 'wrong-password' || e.code == 'invalid-email') {
-                            _showErroDialog(context);
-                          } else if (e.code == 'network-request-failed') {
-                            _showNetworkError(context);
-                          }
-                        } catch (e) {
-                          print('Erreur d\'authentification : $e');
-                        }
+                      } else {
+                      // L'inscription a échoué, vous pouvez afficher un message d'erreur ici
+                      ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Échec de la connexion. Veuillez réessayer.")),
+                      );
                       }
-                    },
+                      // les erreurs possible lier à fireBase
+                      } on FirebaseAuthException catch (e) {
+                      // Gérer les erreurs d'authentification
+
+                      if (e.code == 'user-not-found') {
+                        print('Compte introuvable : ${e.message}');
+                        _formKey.currentState?.reset();
+                        _showUserNotFound(context);
+                      }
+                      else if (e.code == 'wrong-password' || e.code == 'invalid-email') {
+                           _showErroDialog(context);
+                      }
+                      else if (e.code == 'network-request-failed') {
+                          _showNetworkError(context);
+                      }
+                      } catch (e) {
+                          print('Erreur d\'authentification : $e');
+                      }
+                      }
+                      },
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25.0), // Adjust the value as per your preferences
+                        borderRadius: BorderRadius.circular(25.0), // Ajuster la valeur du rayon selon vos préférences
                       ),
                     ),
                     child: Text("SE CONNECTER"),
@@ -216,7 +220,7 @@ class _AuthentificationState extends State<Authentification> {
                 ),
               ),
               Text("Vous n'avez pas de compte ?"),
-              SizedBox(height: 8),
+              SizedBox(height:8),
               GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -240,3 +244,4 @@ class _AuthentificationState extends State<Authentification> {
     );
   }
 }
+
