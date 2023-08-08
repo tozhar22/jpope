@@ -6,7 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jpope/services/FirebaseAuthServices.dart';
-import 'package:sn_progress_dialog/progress_dialog.dart';
+
 
 class AddEvent extends StatefulWidget {
   const AddEvent({super.key});
@@ -249,7 +249,7 @@ class _AddEventState extends State<AddEvent> {
                                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                     content: Text('L\'événement a été ajouté avec succès !'),
                                   ));
-
+                                  Navigator.pop(context, true);
                                 }
                                 catch(e){
 
