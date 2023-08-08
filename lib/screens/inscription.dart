@@ -220,7 +220,7 @@ class _InscriptionState extends State<Inscription> {
 
                           try {
 
-                            AppUser? result = await _auth.registerWithEmailAndPassword(email, password);
+                            AppUser? result = await _auth.registerWithEmailAndPassword(context, email, password);
 
                           if (result != null) {
                             // L'inscription a réussi, vous pouvez effectuer des actions supplémentaires ici
@@ -242,12 +242,16 @@ class _InscriptionState extends State<Inscription> {
                               context,
                               MaterialPageRoute(builder: (context) => ApplicationInterface()), // Remplacez 'HomePage' par le nom de votre page
                             );
-
-                          } else {
-                            // L'inscription a échoué, vous pouvez afficher un message d'erreur ici
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Échec de l'inscription. Veuillez réessayer.")),
+                            showDialog (
+                              context: context,
+                              builder: (BuildContext context) {
+                                return const AlertDialog(
+                                  title: Text('Inscription réussie'),
+                                  content: Text('Vous êtes maintenant inscrit.'),
+                                );
+                              },
                             );
+
                           }
                         } catch (e) {
                           print('Erreur d\'authentification : $e');

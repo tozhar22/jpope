@@ -173,43 +173,39 @@ _showErroDialog(BuildContext context) {
                         String email = emailController.text;
                         String password = passwordController.text;
                         ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Connexion en cours...")),
+                          const SnackBar(content: Text("Connexion en cours...")),
                         );
-                      try {
-                      AppUser? result = await _auth.signInWithEmailAndPassword(email, password);
-                      if (result != null) {
+                        try {
+                          AppUser? result = await _auth.signInWithEmailAndPassword(context, email, password);
+                          if (result != null) {
 
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => ApplicationInterface()), // Remplacez 'HomePage' par le nom de votre page
-                      );
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => ApplicationInterface()), // Remplacez 'HomePage' par le nom de votre page
+                            );
+                            final alertDialogKey = GlobalKey<State>();
 
-                      } else {
-                      // L'inscription a échoué, vous pouvez afficher un message d'erreur ici
-                      ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Échec de la connexion. Veuillez réessayer.")),
-                      );
-                      }
-                      // les erreurs possible lier à fireBase
-                      } on FirebaseAuthException catch (e) {
-                      // Gérer les erreurs d'authentification
+                            showDialog (
+                              context: context,
+                              builder: (BuildContext context) {
+                                return const AlertDialog(
+                                  title: Text('Connexion réussie'),
+                                  content: Text('Vous êtes maintenant connecté.'),
+                                );
+                              },
+                            ).then((_) {
+                              // Ferme automatiquement la boîte de dialogue après 1 seconde.
+                              Future.delayed(Duration(seconds: 1), () async{
+                                Navigator.of(context).pop(); // Ferme automatiquement la boîte de dialogue.
+                              });
+                            });
+                          }
 
-                      if (e.code == 'user-not-found') {
-                        print('Compte introuvable : ${e.message}');
-                        _formKey.currentState?.reset();
-                        _showUserNotFound(context);
-                      }
-                      else if (e.code == 'wrong-password' || e.code == 'invalid-email') {
-                           _showErroDialog(context);
-                      }
-                      else if (e.code == 'network-request-failed') {
-                          _showNetworkError(context);
-                      }
-                      } catch (e) {
+                        }catch (e) {
                           print('Erreur d\'authentification : $e');
+                        }
                       }
-                      }
-                      },
+                    },
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25.0), // Ajuster la valeur du rayon selon vos préférences
