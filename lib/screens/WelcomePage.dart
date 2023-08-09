@@ -52,7 +52,9 @@ class _WelcomePageState extends State<WelcomePage> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -62,12 +64,12 @@ class _WelcomePageState extends State<WelcomePage> {
               children: [
                 Image.asset(
                   "assets/images/logo.png",
-                  height: 150,
+                  height: screenHeight * 0.15,
                 ),
                 Text(
                   "EventPlan",
                   style: TextStyle(
-                    fontSize: 35,
+                    fontSize: screenWidth * 0.08,
                     color: Color(0xFF2196F3),
                     fontFamily: 'Russo_One',
                     fontWeight: FontWeight.bold,
@@ -75,13 +77,13 @@ class _WelcomePageState extends State<WelcomePage> {
                 ),
               ],
             ),
-            SizedBox(height: 70,),
+            SizedBox(height: screenHeight * 0.1),
             Center(
               child: Column(
                 children: [
                   Container(
-                    width: double.infinity,
-                    height: 400,
+                    width: screenWidth * 0.9,
+                    height: screenHeight * 0.5,
                     child: PageView(
                       controller: _pageController,
                       onPageChanged: (int page) {
@@ -134,7 +136,7 @@ class _WelcomePageState extends State<WelcomePage> {
                 ],
               ),
             ),
-            SizedBox(height: 40,),
+            SizedBox(height: screenHeight * 0.08),
             BounceInDown(
               child: ElevatedButton(
                 onPressed: () {
@@ -144,14 +146,17 @@ class _WelcomePageState extends State<WelcomePage> {
                   );
                 },
                 child: Text(
-                  "S'incrire gratuitement",
-                  style: TextStyle(fontSize: 18),
+                  "S'inscrire gratuitement",
+                  style: TextStyle(fontSize: screenWidth * 0.04),
                 ),
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(screenWidth * 0.1),
                   ),
-                  padding: EdgeInsets.only(left: 75, right: 75, top: 10, bottom: 10),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.15,
+                    vertical: screenHeight * 0.01,
+                  ),
                 ),
               ),
             ),
