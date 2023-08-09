@@ -240,7 +240,7 @@ class _InscriptionState extends State<Inscription> {
 
                             Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(builder: (context) => ApplicationInterface()), // Remplacez 'HomePage' par le nom de votre page
+                              MaterialPageRoute(builder: (context) => ApplicationInterface()),
                             );
                             showDialog (
                               context: context,
