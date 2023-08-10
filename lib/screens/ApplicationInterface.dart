@@ -1,36 +1,59 @@
-
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jpope/screens/PageAccueil.dart';
 import 'package:jpope/screens/PageEvenement.dart';
 import 'package:jpope/screens/PagePlaning.dart';
 import 'package:jpope/screens/PageRecherche.dart';
+import 'package:jpope/services/FirebaseAuthServices.dart';
 import 'package:jpope/widgets/NavBar.dart';
-
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
-
 class ApplicationInterface extends StatefulWidget {
-  ApplicationInterface({Key? key,}) : super(key: key);
-
+  ApplicationInterface({Key? key}) : super(key: key);
 
   @override
   State<ApplicationInterface> createState() => _ApplicationInterfaceState();
 }
 
 class _ApplicationInterfaceState extends State<ApplicationInterface> {
-
-
   final PageController _pageController = PageController(initialPage: 0);
   int _currentIndex = 0;
+   String _name = "Admin";
+   String _email = "admin@gmail.com";
+   bool _isAdmin = false;
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
 
+  }
+  // methode qui recuper les infos de l'utlisateur et vérifier si il est administrateru
+  Future<void> _fetchUserData() async {
+    try {
+      final userId = AuthenticationService().getCurrentUserId();
 
+      if (userId.isNotEmpty) {
+        final userDoc = await FirebaseFirestore.instance.collection('User').doc(userId).get();
+        if (userDoc.exists) {
+          final username = userDoc['userName'] ?? "admin";
+          final email = userDoc['mail'] ?? "admin@gmail.com";
 
-  // création d'une méthode qui se chargera de changer le numero de la variable
+          setState(() {
+            _name = username;
+            _email = email;
+          });
 
-  setCurrentIndex(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+          final adminDoc = await FirebaseFirestore.instance.collection('AdminUser').doc(userId).get();
+          final isAdmin = adminDoc.exists;
+
+          setState(() {
+            _isAdmin = isAdmin;
+          });
+        }
+      }
+    } catch (e) {
+      print("Error fetching user info: $e");
+    }
   }
 
   _onBottomNavItemTapped(int index) {
@@ -53,9 +76,8 @@ class _ApplicationInterfaceState extends State<ApplicationInterface> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-
       home: Scaffold(
-        drawer: NavBar(), // Use the correct syntax here
+        drawer: NavBar(name:_name,email: _email,isAdmin: _isAdmin),
         appBar: AppBar(
           title: const Text(
             "EventPlan",
@@ -79,11 +101,11 @@ class _ApplicationInterfaceState extends State<ApplicationInterface> {
         ),
         body: PageView(
           controller: _pageController,
-          onPageChanged: setCurrentIndex,
+          onPageChanged: _onBottomNavItemTapped,
           children: const [
             Accueil(),
             PageEvenement(),
-            Planning(),
+            PlanningPage(),
             Search()
           ],
         ),
@@ -96,19 +118,16 @@ class _ApplicationInterfaceState extends State<ApplicationInterface> {
               title: Text("Accueil"),
               selectedColor: Colors.blueAccent,
             ),
-
             SalomonBottomBarItem(
               icon: Icon(Icons.add_circle),
               title: Text("Evenement"),
               selectedColor: Colors.blueAccent,
             ),
-
             SalomonBottomBarItem(
               icon: Icon(Icons.calendar_month),
               title: Text("Planning"),
               selectedColor: Colors.blueAccent,
             ),
-
             SalomonBottomBarItem(
               icon: Icon(Icons.search),
               title: Text("Recherche"),

@@ -8,7 +8,6 @@ import 'Authentification.dart';
 
 
 
-
 class Inscription extends StatefulWidget {
   const Inscription({Key? key}) : super(key: key);
   @override
@@ -235,7 +234,6 @@ class _InscriptionState extends State<Inscription> {
                               'mail': email,
                               'userName': userName,
                               'password' : password,
-                              'URL_image' : null
                             });
 
                             Navigator.pushReplacement(

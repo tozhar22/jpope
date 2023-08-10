@@ -1,10 +1,14 @@
+
 import 'package:flutter/material.dart';
-import 'package:jpope/screens/Authentification.dart';
+
 import 'package:jpope/screens/WelcomePage.dart';
 import 'package:jpope/services/FirebaseAuthServices.dart';
 
 class NavBar extends StatelessWidget {
-  const NavBar({Key? key}) : super(key: key);
+  final String name;
+  final String email;
+  final bool isAdmin;
+  const NavBar({Key? key, required this.name, required this.email, required this.isAdmin}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -13,15 +17,11 @@ class NavBar extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           UserAccountsDrawerHeader(
-            accountName: Text("Admin"),
-            accountEmail: Text("admin@gmail.com"),
+            accountName: Text(name),
+            accountEmail: Text(email),
             currentAccountPicture: CircleAvatar(
               child: ClipOval(
-                child: Image.network(
-                  'https://photos.google.com/u/1/photo/AF1QipMkyQfBFgPEfz1GrPuRMJITxuI4CTujkGJ_OIym',
-                  width: 90,
-                  height: 90,
-                ),
+                child: Image.asset('assets/images/profile-user.png'),
               ),
             ),
             decoration: BoxDecoration(color: Colors.blueAccent),
@@ -43,6 +43,17 @@ class NavBar extends StatelessWidget {
             ),
             onTap: () => null,
           ),
+          if (isAdmin) // Add the admin-specific option if isAdmin is true
+            ListTile(
+              leading: Icon(Icons.admin_panel_settings),
+              title: Text(
+                'Admin Actions',
+                style: TextStyle(fontSize: 16),
+              ),
+              onTap: () {
+                // Handle admin-specific action
+              },
+            ),
           Divider(),
           ListTile(
             leading: Icon(Icons.person_off_rounded),
@@ -60,6 +71,7 @@ class NavBar extends StatelessWidget {
               } catch (e) {}
             },
           )
+
         ],
       ),
     );

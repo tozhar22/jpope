@@ -269,12 +269,16 @@ class _AddEventState extends State<AddEvent> {
                       ),
                       const SizedBox(width: 12,),
                       ElevatedButton(
-                        onPressed: (){
-                            Navigator.of(context).pop();
+                        onPressed: () {
+                          Navigator.of(context).pop();
                         },
+                        style: ElevatedButton.styleFrom(
+                           backgroundColor: Colors.grey
+                        ),
                         child: const Text(
                           "ANNULER",
                           style: TextStyle(
+                            color: Color(0xFF2196F3),
                             fontSize: 15,
                             fontFamily: 'Russo_One',
                           ),
