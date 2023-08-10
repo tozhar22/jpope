@@ -103,7 +103,7 @@ class _AddEventState extends State<AddEvent> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return ("Tu dois completer ce champ");
+                          return ("Vous devez completer ce champ");
                         }
                         return null;
                       },

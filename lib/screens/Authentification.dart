@@ -109,8 +109,8 @@ _showErroDialog(BuildContext context) {
                   borderRadius: BorderRadius.circular(100),
                   child: Image.asset(
                     'assets/images/log.png',
-                    height: 150,
-                    width: 150,
+                    height: 140,
+                    width: 140,
                   ),
                 ),
               ),
@@ -154,6 +154,7 @@ _showErroDialog(BuildContext context) {
                       borderRadius: BorderRadius.circular(25.0),
                     ),
                   ),
+                  obscureText: true, // Masquer le texte du mot de passe
                   validator: (value) {
                     if (value == null || value.isEmpty || value.length < 6) {
                       return "Le mot de passe doit contenir au moins 6 caractères";

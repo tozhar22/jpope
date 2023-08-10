@@ -97,6 +97,19 @@ class _InscriptionState extends State<Inscription> {
       },
     );
   }
+  Future<bool> isUsernameTaken(String username) async {
+    try {
+      final QuerySnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('User')
+          .where('userName', isEqualTo: username)
+          .get();
+
+      return userSnapshot.docs.isNotEmpty;
+    } catch (e) {
+      print("Erreur lors de la vérification du nom d'utilisateur : $e");
+      return true; // Traitez les erreurs de manière appropriée
+    }
+  }
 
   @override
   void dispose() {
@@ -187,6 +200,7 @@ class _InscriptionState extends State<Inscription> {
                       borderRadius: BorderRadius.circular(25.0),
                     ),
                   ),
+                  obscureText: true, // Masquer le texte du mot de passe
                   validator: (value) {
                     if (value == null || value.isEmpty || value.length < 6) {
                       return "Le mot de passe doit contenir au moins 6 caractères";
@@ -211,15 +225,36 @@ class _InscriptionState extends State<Inscription> {
                         String password = passwordController.text;
 
 
-                        ScaffoldMessenger.of(context).showSnackBar(
+                          if (await isUsernameTaken(userName)) {
+                          // Le nom d'utilisateur est déjà pris, affichez un message d'erreur
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Nom d'uilisateur déja utiliser"),
+                                  content: Text('Veuillez changer votre nom d\'utilisateur.'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text('Fermer'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          } else {
+                          // Le nom d'utilisateur est disponible, continuez le processus d'inscription
+                          ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text("Inscription en cours...")),
-                        );
-
+                          );
                         // Appelle de la méthode d'inscription depuis la class d'authentification
 
                           try {
 
                             AppUser? result = await _auth.registerWithEmailAndPassword(context, email, password);
+
 
                           if (result != null) {
                             // L'inscription a réussi, vous pouvez effectuer des actions supplémentaires ici
@@ -252,8 +287,9 @@ class _InscriptionState extends State<Inscription> {
 
                           }
                         } catch (e) {
-                          print('Erreur d\'authentification : $e');
-                        }
+                            print('Erreur d\'authentification : $e');
+                          }
+                          }
                       }
                     },
                     style: ElevatedButton.styleFrom(

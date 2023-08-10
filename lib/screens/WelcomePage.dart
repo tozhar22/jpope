@@ -56,131 +56,129 @@ class _WelcomePageState extends State<WelcomePage> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  "assets/images/logo.png",
-                  height: screenHeight * 0.15,
+      body: Column(
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                "assets/images/logo.png",
+                height: screenHeight * 0.15,
+              ),
+              Text(
+                "EventPlan",
+                style: TextStyle(
+                  fontSize: screenWidth * 0.08,
+                  color: Color(0xFF2196F3),
+                  fontFamily: 'Russo_One',
+                  fontWeight: FontWeight.bold,
                 ),
-                Text(
-                  "EventPlan",
-                  style: TextStyle(
-                    fontSize: screenWidth * 0.08,
-                    color: Color(0xFF2196F3),
-                    fontFamily: 'Russo_One',
-                    fontWeight: FontWeight.bold,
+              ),
+            ],
+          ),
+          SizedBox(height: screenHeight * 0.1),
+          Center(
+            child: Column(
+              children: [
+                Container(
+                  width: screenWidth * 0.9,
+                  height: screenHeight * 0.5,
+                  child: PageView(
+                    controller: _pageController,
+                    onPageChanged: (int page) {
+                      _currentPageNotifier.value = page;
+                    },
+                    children: [
+                      Column(
+                        children: [
+                          SvgPicture.asset("assets/images/evenement.svg", width: 300),
+                          SizedBox(height: 30),
+                          Text(
+                            "Crée un événement",
+                            style: TextStyle(
+                                fontSize: 18
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          SvgPicture.asset("assets/images/tache.svg", width: 300),
+                          SizedBox(height: 30),
+                          Text(
+                            "Gérez tout, sans souci",
+                            style: TextStyle(
+                                fontSize: 18
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          SvgPicture.asset("assets/images/time.svg", width: 300),
+                          SizedBox(height: 28),
+                          Text(
+                              "Moins de tracas, plus de temps pour vous",
+                            style: TextStyle(
+                                fontSize: 18
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
+                ),
+                CirclePageIndicator(
+                  itemCount: 3,
+                  currentPageNotifier: _currentPageNotifier,
                 ),
               ],
             ),
-            SizedBox(height: screenHeight * 0.1),
-            Center(
-              child: Column(
-                children: [
-                  Container(
-                    width: screenWidth * 0.9,
-                    height: screenHeight * 0.5,
-                    child: PageView(
-                      controller: _pageController,
-                      onPageChanged: (int page) {
-                        _currentPageNotifier.value = page;
-                      },
-                      children: [
-                        Column(
-                          children: [
-                            SvgPicture.asset("assets/images/evenement.svg", width: 300),
-                            SizedBox(height: 30),
-                            Text(
-                              "Crée un événement",
-                              style: TextStyle(
-                                  fontSize: 18
-                              ),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            SvgPicture.asset("assets/images/tache.svg", width: 300),
-                            SizedBox(height: 30),
-                            Text(
-                              "Gérez tout, sans souci",
-                              style: TextStyle(
-                                  fontSize: 18
-                              ),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            SvgPicture.asset("assets/images/time.svg", width: 300),
-                            SizedBox(height: 30),
-                            Text(""
-                                "Moins de tracas, plus de temps pour vous",
-                              style: TextStyle(
-                                  fontSize: 18
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  CirclePageIndicator(
-                    itemCount: 3,
-                    currentPageNotifier: _currentPageNotifier,
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: screenHeight * 0.08),
-            BounceInDown(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Inscription()),
-                  );
-                },
-                child: Text(
-                  "S'inscrire gratuitement",
-                  style: TextStyle(fontSize: screenWidth * 0.04),
-                ),
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(screenWidth * 0.1),
-                  ),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: screenWidth * 0.15,
-                    vertical: screenHeight * 0.01,
-                  ),
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed:(){
+          ),
+          SizedBox(height: screenHeight * 0.04),
+          BounceInDown(
+            child: ElevatedButton(
+              onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Authentification()),
+                  MaterialPageRoute(builder: (context) => Inscription()),
                 );
               },
               child: Text(
-                "Vous avez un compte ? Connectez-vous",
-                style: TextStyle(
-                    color:  Colors.grey,
-                    fontSize: 15
+                "S'inscrire gratuitement",
+                style: TextStyle(fontSize: screenWidth * 0.04),
+              ),
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(screenWidth * 0.1),
+                ),
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.15,
+                  vertical: screenHeight * 0.01,
                 ),
               ),
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                elevation: MaterialStateProperty.all(0),
+            ),
+          ),
+          ElevatedButton(
+            onPressed:(){
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Authentification()),
+              );
+            },
+            child: Text(
+              "Vous avez un compte ? Connectez-vous",
+              style: TextStyle(
+                  color:  Colors.grey,
+                  fontSize: 15
               ),
-            )
-          ],
-        ),
+            ),
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(Colors.transparent),
+              elevation: MaterialStateProperty.all(0),
+            ),
+          )
+        ],
       ),
     );
   }
