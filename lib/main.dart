@@ -9,7 +9,7 @@ import 'firebase_options.dart';
 import 'models/SplashScreenWrapper.dart';
 
 void main() async {
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -18,7 +18,7 @@ void main() async {
     // Utilisez un Builder pour s'assurer que le StreamProvider est initialisé
     Builder(
       builder: (context) {
-        return MyApp();
+        return const MyApp();
       },
     ),
   );
@@ -34,6 +34,11 @@ class MyApp extends StatelessWidget {
       initialData: null,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
+        title: 'Mon App',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          // Autres configurations de thème possibles
+        ),
         home: SplashScreenWrapper(),
       ),
     );

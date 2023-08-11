@@ -76,6 +76,7 @@ class _ApplicationInterfaceState extends State<ApplicationInterface> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         drawer: NavBar(name:_name,email: _email,isAdmin: _isAdmin),
         appBar: AppBar(
