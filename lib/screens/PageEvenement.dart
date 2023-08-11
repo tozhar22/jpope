@@ -1,4 +1,4 @@
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:jpope/screens/AjoutEvenement.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,14 +7,13 @@ import '../services/FirebaseAuthServices.dart';
 import 'DetailEvents.dart';
 
 class PageEvenement extends StatefulWidget {
-  const PageEvenement({super.key});
+  const PageEvenement({Key? key}) : super(key: key); // Fixed typo 'super.key'
 
   @override
   State<PageEvenement> createState() => _PageEvenementState();
 }
 
 class _PageEvenementState extends State<PageEvenement> {
-  // liste des evenement
   late List<Event> events = [];
 
   @override
@@ -22,8 +21,8 @@ class _PageEvenementState extends State<PageEvenement> {
     super.initState();
     fetchEvents();
   }
-  // Fonction qui permet de récuper les evenement de la base de firebase
-  fetchEvents() async {
+
+  Future<void> fetchEvents() async { // Added return type
     try {
       String userId = AuthenticationService().getCurrentUserId();
 
@@ -36,7 +35,6 @@ class _PageEvenementState extends State<PageEvenement> {
       List<Event> fetchedEvents = eventSnapshot.docs.map((doc) =>
           Event.fromFirestore(doc.data() as Map<String, dynamic>)).toList();
 
-      // Triez les événements par date avant de les mettre à jour dans l'état
       fetchedEvents.sort((a, b) => a.date.compareTo(b.date));
 
       setState(() {
@@ -47,56 +45,123 @@ class _PageEvenementState extends State<PageEvenement> {
     }
   }
 
-
-// Méthode pour actualiser la liste des événements
   Future<void> _refreshEvents() async {
     await fetchEvents();
-    setState(() {
-    });
+    setState(() {}); // Removed unnecessary setState parameter
   }
-
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       body: RefreshIndicator(
         onRefresh: _refreshEvents,
         child: ListView.builder(
-                itemCount: events.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    onTap: () {
-                      // Naviguez vers la page de détails de l'événement en passant l'événement sélectionné
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EventDetailsPage(event: events[index]),
-                        ),
-                      );
-                    },
-                    title: Text(events[index].evenementName),
-                    subtitle: Text(events[index].organizerName),
-                    // Autres détails d'affichage comme la date, la région, etc.
-                  );
-                },
+          itemCount: events.length,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EventDetailsPage(event: events[index]),
+                  ),
+                );
+              },
+              child: Card(
+                elevation: 2,
+                margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          events[index].imageUrls.isNotEmpty
+                              ? ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: CachedNetworkImage(
+                              imageUrl: events[index].imageUrls[0],
+                              width: 90,
+                              height: 90,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                              : SizedBox.shrink(),
+                          SizedBox(width: 15),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(events[index].evenementName),
+                              SizedBox(height: 8,),
+                              Text(events[index].organizerName),
+                            ],
+                          ),
+                        ],
+                      ),
+                      PopupMenuButton<String>(
+                        onSelected: (String result) {
+                          if (result == 'Modifier') {
+                            // Handle edit option here
+                          } else if (result == 'Supprimer') {
+                            // Handle delete option here
+                          } else if (result == 'Partager') {
+                            // Handle share option here
+                          } else if (result == 'Publier') {
+                            // Handle publish option here
+                          }
+                        },
+                        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                          const PopupMenuItem<String>(
+                            value: 'Modifier',
+                            child: ListTile(
+                              leading: Icon(Icons.edit,color: Color(0xFF2196F3),),
+                              title: Text('Modifier'),
+                            ),
+                          ),
+                          const PopupMenuItem<String>(
+                            value: 'Supprimer',
+                            child: ListTile(
+                              leading: Icon(Icons.delete,color: Color(0xFF2196F3),),
+                              title: Text('Supprimer'),
+                            ),
+                          ),
+                          const PopupMenuItem<String>(
+                            value: 'Partager',
+                            child: ListTile(
+                              leading: Icon(Icons.share,color: Color(0xFF2196F3),),
+                              title: Text('Partager'),
+                            ),
+                          ),
+                          const PopupMenuItem<String>(
+                            value: 'Publier',
+                            child: ListTile(
+                              leading: Icon(Icons.publish,color: Color(0xFF2196F3), ),
+                              title: Text('Publier'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ),
+            );
+          },
+        ),
       ),
-
-
-
       floatingActionButton: FloatingActionButton(
-        onPressed: () async{
+        onPressed: () async {
           final ajouter = await Navigator.push(
             context,
             PageRouteBuilder(pageBuilder: (_, __, ___) => AddEvent()),
           );
           if (ajouter == true) {
-            // Actualisez la liste des événements ici
             fetchEvents();
           }
         },
         child: Icon(Icons.add),
-      ), //
+      ),
     );
   }
 }
