@@ -103,10 +103,10 @@ class _ApplicationInterfaceState extends State<ApplicationInterface> {
         body: PageView(
           controller: _pageController,
           onPageChanged: _onBottomNavItemTapped,
-          children: const [
+          children: [
             Accueil(),
             PageEvenement(),
-            PlanningPage(),
+            EventCalendarPage(),
             Search()
           ],
         ),

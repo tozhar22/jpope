@@ -1,61 +1,86 @@
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:date_field/date_field.dart';
-import 'dart:io';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:jpope/services/FirebaseAuthServices.dart';
 
-
 class AddEvent extends StatefulWidget {
-  const AddEvent({super.key});
+  const AddEvent({Key? key}) : super(key: key);
 
   @override
   State<AddEvent> createState() => _AddEventState();
 }
 
 class _AddEventState extends State<AddEvent> {
-
   final _formKey = GlobalKey<FormState>();
   final EvenementNameController = TextEditingController();
   final OrganistorNameController = TextEditingController();
   final descriptionController = TextEditingController();
-  DateTime selectDate = DateTime.now();
+  DateTime? selectedDateTime; // Store selected date and time
+
   String selectRegion = 'region maritime';
 
-
-
   final ImagePicker _imagePicker = ImagePicker();
-  List<File> multiimages =[];
+  List<File> multiimages = [];
 
-  multiImagePicker()async{
+  multiImagePicker() async {
     final List<XFile> pickedImage = await _imagePicker.pickMultiImage();
     pickedImage.forEach((e) {
       multiimages.add(File(e.path));
-    }
-    );
-    setState(() {
-
     });
+    setState(() {});
   }
-  // Méthode pour enregister les images
+
+  Future<void> addEvent() async {
+
+    if (_formKey.currentState!.validate()) {
+      List<String> imageUrls = await uploadImagesToFirebase(multiimages);
+
+      final DonneEvenement = {
+        'evenementName': EvenementNameController.text,
+        'organistorName': OrganistorNameController.text,
+        'description': descriptionController.text,
+        'region': selectRegion,
+        'datetime': Timestamp.fromDate(selectedDateTime!),
+        'imageUrls': imageUrls,
+      };
+      String? userId = AuthenticationService().getCurrentUserId();
+
+      final collectionEvenementCree = FirebaseFirestore.instance
+          .collection('User')
+          .doc(userId)
+          .collection('Evenement_cree');
+
+      try {
+        await collectionEvenementCree.add(DonneEvenement);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("L'événement a été ajouté avec succès !"),
+          ),
+        );
+        Navigator.pop(context, true);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Une erreur s'est produite lors de l'ajout de l'événement."),
+          ),
+        );
+      }
+    }
+  }
+
   Future<List<String>> uploadImagesToFirebase(List<File> images) async {
+
     List<String> imageUrls = [];
 
     for (var image in images) {
-      // Create a unique filename for each image
       String filename = DateTime.now().millisecondsSinceEpoch.toString();
-
-      // Reference to the image in Firebase Storage
       Reference storageReference =
       FirebaseStorage.instance.ref().child('event_images/$filename.jpg');
-
-      // Upload the image to Firebase Storage
       UploadTask uploadTask = storageReference.putFile(image);
       await uploadTask;
-
-      // Get the download URL of the uploaded image
       String imageUrl = await storageReference.getDownloadURL();
       imageUrls.add(imageUrl);
     }
@@ -71,10 +96,6 @@ class _AddEventState extends State<AddEvent> {
     super.dispose();
   }
 
-  @override
-  void initState() {
-    super.initState();
-  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,13 +118,13 @@ class _AddEventState extends State<AddEvent> {
                   const SizedBox(height: 25,),
                   TextFormField(
                       decoration: const InputDecoration(
-                          labelText: "Non de l'Evènement",
+                          labelText: "Nom de l'Evènement",
                           hintText: "Saisir le nom de l'Evenement",
                           border: OutlineInputBorder()
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return ("Vous devez completer ce champ");
+                          return ("Vous devez compléter ce champ");
                         }
                         return null;
                       },
@@ -113,12 +134,12 @@ class _AddEventState extends State<AddEvent> {
                   TextFormField(
                     decoration: const InputDecoration(
                         labelText: "Organisateur",
-                        hintText: "Saisir le nom de l'organisteur",
+                        hintText: "Saisir le nom de l'organisateur",
                         border: OutlineInputBorder()
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return ("Tu dois completer ce champ");
+                        return ("Vous devez compléter ce champ");
                       }
                       return null;
                     },
@@ -134,7 +155,7 @@ class _AddEventState extends State<AddEvent> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return "Tu dois compléter ce champ";
+                        return "Vous devez compléter ce champ";
                       }
                       return null;
                     },
@@ -146,7 +167,7 @@ class _AddEventState extends State<AddEvent> {
                         DropdownMenuItem(
                             value: 'region maritime', child: Text("Maritime")),
                         DropdownMenuItem(
-                            value: 'region des Plateux', child: Text("Plateaux")),
+                            value: 'region des Plateaux', child: Text("Plateaux")),
                         DropdownMenuItem(
                             value: 'region centrale', child: Text("Centrale")),
                         DropdownMenuItem(
@@ -165,30 +186,56 @@ class _AddEventState extends State<AddEvent> {
                       }
                   ),
                   const SizedBox(height: 25,),
-                  DateTimeFormField(
-                    decoration: const InputDecoration(
-                      hintStyle: TextStyle(color: Colors.black45),
-                      errorStyle: TextStyle(color: Colors.redAccent),
-                      border: OutlineInputBorder(),
-                      suffixIcon: Icon(Icons.event_note),
-                      labelText: 'Choisir une date',
+
+                  TextFormField(
+                    controller: TextEditingController(
+                      text: selectedDateTime != null
+                          ? DateFormat('yyyy-MM-dd HH:mm').format(selectedDateTime!)
+                          : '',
                     ),
-                    mode: DateTimeFieldPickerMode.dateAndTime,
-                    autovalidateMode: AutovalidateMode.always,
-                    validator: (e) =>
-                    (e?.day ?? 0) == 1
-                        ? 'Please not the first day'
-                        : null,
-                    onDateSelected: (DateTime value) {
-                      setState(() {
-                        selectDate = value;
+                    readOnly: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Vous devez compléter ce champ";
+                      }
+                      return null;
+                    },
+                    onTap: () {
+                      showDatePicker(
+                        context: context,
+                        initialDate: selectedDateTime ?? DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2101),
+                      ).then((date) {
+                        if (date != null) {
+                          showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.fromDateTime(selectedDateTime ?? DateTime.now()),
+                          ).then((time) {
+                            if (time != null) {
+                              setState(() {
+                                selectedDateTime = DateTime(
+                                  date.year,
+                                  date.month,
+                                  date.day,
+                                  time.hour,
+                                  time.minute,
+                                );
+                              });
+                            }
+                          });
+                        }
                       });
                     },
+                    decoration: const InputDecoration(
+                      labelText: "Date et Heure de evenement",
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                   const SizedBox(height: 25,),
                   ElevatedButton(
                     onPressed: () {
-                        multiImagePicker();
+                      multiImagePicker();
                     },
                     child: const Row(
                       children: [
@@ -199,7 +246,7 @@ class _AddEventState extends State<AddEvent> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
                     child: (multiimages.length == 1)
                         ? Image.file(File(multiimages[0].path)) // Affiche la seule image en grand.
                         : GridView.count(
@@ -212,60 +259,19 @@ class _AddEventState extends State<AddEvent> {
                           .toList(),
                     ),
                   ),
-
                   const SizedBox(height: 30,),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       ElevatedButton(
-                          onPressed: () async {
-                              if(_formKey.currentState!.validate()){
-
-                                // envoiyer l'image sur firebase Storage
-
-                                  List<String> imageUrls = await uploadImagesToFirebase(multiimages);
-
-                                // Ajouter les donnée de l'evenement sur fireStore
-
-                                  final DonneEvenement = {
-                                    'evenementName': EvenementNameController.text,
-                                    'organistorName': OrganistorNameController.text,
-                                    'description': descriptionController.text,
-                                    'region': selectRegion,
-                                    'date': selectDate.toIso8601String(),
-                                    'imageUrls': imageUrls,
-                                  };
-
-                                // Obtenir l'ID de l'utilisateur actuel
-
-                                  String? userId = AuthenticationService().getCurrentUserId();
-
-                                  // Référence à la sous-collection 'Evenement_cree' du document de l'utilisateur
-                                final collectionEvementCree = FirebaseFirestore.instance.collection('User').doc(userId).collection('Evenement_cree');
-                                try{
-                                  await collectionEvementCree.add(DonneEvenement);
-
-                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                    content: Text('L\'événement a été ajouté avec succès !'),
-                                  ));
-                                  Navigator.pop(context, true);
-                                }
-                                catch(e){
-
-                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                    content: Text('Une erreur s\'est produite lors de l\'ajout de l\'événement.'),
-                                  ));
-                                }
-                              }
-                          },
-                          child: const Text(
-                            "AJOUTER",
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontFamily: 'Russo_One',
-                            ),
+                        onPressed:addEvent,
+                        child: const Text(
+                          "AJOUTER",
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontFamily: 'Russo_One',
                           ),
+                        ),
                       ),
                       const SizedBox(width: 12,),
                       ElevatedButton(
@@ -273,7 +279,7 @@ class _AddEventState extends State<AddEvent> {
                           Navigator.of(context).pop();
                         },
                         style: ElevatedButton.styleFrom(
-                           backgroundColor: Colors.grey
+                            backgroundColor: Colors.grey
                         ),
                         child: const Text(
                           "ANNULER",
@@ -293,6 +299,5 @@ class _AddEventState extends State<AddEvent> {
         ),
       ),
     );
-
-}
+  }
 }

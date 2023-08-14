@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           // Autres configurations de thème possibles
         ),
-        home: SplashScreenWrapper(),
+        home: const SplashScreenWrapper(),
       ),
     );
   }

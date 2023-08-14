@@ -1,10 +1,11 @@
-// Classse evenement qui formate les donner de firebase
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Event {
   final String evenementName;
   final String organizerName;
   final String description;
   final String region;
-  final DateTime date;
+  final Timestamp timestamp; // Utilisez le type Timestamp pour stocker le timestamp
   final List<String> imageUrls;
 
   Event({
@@ -12,7 +13,7 @@ class Event {
     required this.organizerName,
     required this.description,
     required this.region,
-    required this.date,
+    required this.timestamp, // Mettez à jour ici
     required this.imageUrls,
   });
 
@@ -22,8 +23,10 @@ class Event {
       organizerName: data['organistorName'],
       description: data['description'],
       region: data['region'],
-      date: DateTime.parse(data['date']),
+      timestamp: data['datetime'], // Assurez-vous d'utiliser le bon nom de champ
       imageUrls: List<String>.from(data['imageUrls']),
     );
   }
+
+  DateTime get date => timestamp.toDate(); // Méthode pour obtenir la date à partir du timestamp
 }
