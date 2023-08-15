@@ -34,27 +34,37 @@ class _AddEventState extends State<AddEvent> {
   }
 
   Future<void> addEvent() async {
-
     if (_formKey.currentState!.validate()) {
       List<String> imageUrls = await uploadImagesToFirebase(multiimages);
 
-      final DonneEvenement = {
+      final donneEvenement = {
         'evenementName': EvenementNameController.text,
         'organistorName': OrganistorNameController.text,
         'description': descriptionController.text,
         'region': selectRegion,
         'datetime': Timestamp.fromDate(selectedDateTime!),
         'imageUrls': imageUrls,
+        'status': 'cree',
+        'eventId': '',
       };
+
       String? userId = AuthenticationService().getCurrentUserId();
 
-      final collectionEvenementCree = FirebaseFirestore.instance
+      final collectionEvenement = FirebaseFirestore.instance
           .collection('User')
           .doc(userId)
-          .collection('Evenement_cree');
+          .collection('Evenement');
 
       try {
-        await collectionEvenementCree.add(DonneEvenement);
+        final newDocRef = await collectionEvenement.add(donneEvenement);
+        String newDocId = newDocRef.id; // Récupérer l'ID généré
+
+        // Mettre à jour l'identifiant unique dans le dictionnaire
+        donneEvenement['eventId'] = newDocId;
+
+        // Mettre à jour le document avec l'identifiant unique
+        await newDocRef.update(donneEvenement);
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("L'événement a été ajouté avec succès !"),

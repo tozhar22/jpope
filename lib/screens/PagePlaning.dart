@@ -28,12 +28,12 @@ class _EventCalendarPageState extends State<EventCalendarPage> {
     final eventsSnapshot = await FirebaseFirestore.instance
         .collection('User')
         .doc(userId)
-        .collection('Evenement_cree')
+        .collection('Evenement')
         .get();
 
     setState(() {
       events = eventsSnapshot.docs
-          .map((doc) => Event.fromFirestore(doc.data() as Map<String, dynamic>))
+          .map((doc) => Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>))
           .toList();
     });
   }
