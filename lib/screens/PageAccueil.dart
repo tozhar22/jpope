@@ -1,16 +1,137 @@
-
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../models/Event.dart';
+import 'Plus informations.dart';
+
 
 class Accueil extends StatefulWidget {
-  const Accueil({super.key});
+  const Accueil({Key? key}) : super(key: key);
 
   @override
   State<Accueil> createState() => _AccueilState();
 }
 
 class _AccueilState extends State<Accueil> {
+  late List<Event> publishedEvents = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAllPublishedEvents();
+  }
+
+  Future<void> fetchAllPublishedEvents() async {
+    try {
+      QuerySnapshot userSnapshot =
+      await FirebaseFirestore.instance.collection('User').get();
+
+      List<Event> allPublishedEvents = [];
+
+      for (QueryDocumentSnapshot userDoc in userSnapshot.docs) {
+        QuerySnapshot eventSnapshot = await userDoc.reference
+            .collection('Evenement')
+            .where('status', isEqualTo: 'Publier')
+            .get();
+
+        List<Event> userPublishedEvents = eventSnapshot.docs
+            .map((doc) =>
+            Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>))
+            .toList();
+
+        allPublishedEvents.addAll(userPublishedEvents);
+      }
+
+      allPublishedEvents.sort((a, b) => a.date.compareTo(b.date));
+
+      setState(() {
+        publishedEvents = allPublishedEvents;
+      });
+    } catch (e) {
+      print("Erreur lors de la récupération des événements publiés : $e");
+    }
+  }
+
+  Widget buildEventCard(Event event) {
+    return Card(
+      margin: EdgeInsets.all(8),
+      elevation: 2,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ListTile(
+            leading: CircleAvatar(
+              child: ClipOval(
+                child: Image.asset('assets/images/profile-user.png'),
+              ),
+            ),
+            title: Text(event.evenementName),
+            subtitle: Text(event.organizerName),
+          ),
+          Container(
+            width: double.infinity,
+            child: Image.network(
+              event.imageUrls[0],
+              fit: BoxFit.cover,
+              loadingBuilder: (BuildContext context, Widget child,
+                  ImageChunkEvent? loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Center(
+                  child: CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                        loadingProgress.expectedTotalBytes!
+                        : null,
+                  ),
+                );
+              },
+            ),
+          ),
+          ButtonBar(
+            alignment: MainAxisAlignment.start,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  // Gérez l'action de clic sur le bouton ici (s'inscrire)
+                },
+                child: Text('S\'inscrire'),
+              ),
+              TextButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => MoreInfoDialog(event: event),
+                  );
+                },
+                child: Text('Plus d\'informations'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _refreshEvents() async {
+    await fetchAllPublishedEvents();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      body: RefreshIndicator(
+        onRefresh: _refreshEvents,
+        child: ListView.builder(
+          itemCount: publishedEvents.length,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () {
+                // Naviguez vers la page de détails de l'événement ici si nécessaire
+              },
+              child: buildEventCard(publishedEvents[index]),
+            );
+          },
+        ),
+      ),
+    );
   }
 }
