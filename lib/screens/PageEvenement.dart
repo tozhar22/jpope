@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/Event.dart';
 import '../services/FirebaseAuthServices.dart';
 import 'DetailEvents.dart';
+import 'EditEvent.dart';
 
 class PageEvenement extends StatefulWidget {
   const PageEvenement({Key? key}) : super(key: key);
@@ -189,7 +190,12 @@ class _PageEvenementState extends State<PageEvenement> {
                       PopupMenuButton<String>(
                         onSelected: (String result) async {
                           if (result == 'Modifier') {
-                            // Handle edit option here
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditEvent(event: events[index]),
+                              ),
+                            );
                           } else if (result == 'Supprimer') {
                             confirmDelete(events[index]);
                           } else if (result == 'Partager') {
