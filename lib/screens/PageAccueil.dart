@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/Event.dart';
+import '../services/FirebaseAuthServices.dart';
 import 'Plus informations.dart';
 
 
@@ -35,7 +36,7 @@ class _AccueilState extends State<Accueil> {
 
         List<Event> userPublishedEvents = eventSnapshot.docs
             .map((doc) =>
-            Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>))
+              Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>))
             .toList();
 
         allPublishedEvents.addAll(userPublishedEvents);
@@ -50,7 +51,48 @@ class _AccueilState extends State<Accueil> {
       print("Erreur lors de la récupération des événements publiés : $e");
     }
   }
+  void _EventInscription(Event event) async {
+    try {
+      String userId = AuthenticationService().getCurrentUserId();
 
+      // Mettre à jour les champs registeredCount et registeredUsers de l'événement
+      DocumentReference eventRef = FirebaseFirestore.instance
+          .collection('User')
+          .doc(event.organizerId)
+          .collection('Evenement')
+          .doc(event.id);
+
+      await eventRef.update({
+        'registeredCount': FieldValue.increment(1),
+        'registeredUsers': FieldValue.arrayUnion([userId]),
+      });
+
+      // Ajouter les informations de l'événement à la sous-collection de l'utilisateur inscrit
+      DocumentReference userEventRef = FirebaseFirestore.instance
+          .collection('User')
+          .doc(userId)
+          .collection('EvenementsInscrits')
+          .doc(event.id);
+
+      await userEventRef.set({
+        'evenementName': event.evenementName,
+        'organizerName': event.organizerName,
+        'imageUrls': event.imageUrls,
+        'description': event.description,
+        'region': event.region,
+        'datetime': event.timestamp,
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Inscription réussie')),
+      );
+    } catch (e) {
+      print("Erreur lors de l'inscription à l'événement : $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur lors de l\'inscription')),
+      );
+    }
+  }
   Widget buildEventCard(Event event) {
     return Card(
       margin: EdgeInsets.all(8),
@@ -91,7 +133,7 @@ class _AccueilState extends State<Accueil> {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  // Gérez l'action de clic sur le bouton ici (s'inscrire)
+                  _EventInscription(event);
                 },
                 child: Text('S\'inscrire'),
               ),

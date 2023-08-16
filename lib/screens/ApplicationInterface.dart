@@ -104,10 +104,10 @@ class _ApplicationInterfaceState extends State<ApplicationInterface> {
           controller: _pageController,
           onPageChanged: _onBottomNavItemTapped,
           children: [
-            Accueil(),
-            PageEvenement(),
+            const Accueil(),
+            const PageEvenement(),
             EventCalendarPage(),
-            Search()
+            const Search()
           ],
         ),
         bottomNavigationBar: SalomonBottomBar(

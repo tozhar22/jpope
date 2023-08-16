@@ -14,11 +14,13 @@ class _EventCalendarPageState extends State<EventCalendarPage> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
-  List<Event> events = [];
+  List<Event> createdEvents = [];
+  List<Event> registeredEvents = [];
 
   @override
   void initState() {
     super.initState();
+    _fetchRegisteredEvents();
     _fetchEvents();
   }
 
@@ -32,18 +34,47 @@ class _EventCalendarPageState extends State<EventCalendarPage> {
         .get();
 
     setState(() {
-      events = eventsSnapshot.docs
+      createdEvents = eventsSnapshot.docs
           .map((doc) => Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>))
           .toList();
     });
   }
 
+  Future<void> _fetchRegisteredEvents() async {
+    String? userId = AuthenticationService().getCurrentUserId();
+
+    final registeredEventsSnapshot = await FirebaseFirestore.instance
+        .collection('User')
+        .doc(userId)
+        .collection('EvenementsInscrits')
+        .get();
+
+    setState(() {
+      registeredEvents = registeredEventsSnapshot.docs
+          .map((doc) => Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>))
+          .toList();
+    });
+
+    print('Registered Events:');
+    for (Event event in registeredEvents) {
+      print('Event Name: ${event.evenementName}, Date: ${event.date}');
+    }
+  }
+
   List<Event> _getEventsForDay(DateTime day) {
-    return events.where((event) {
-      return event.date.year == day.year &&
-          event.date.month == day.month &&
-          event.date.day == day.day;
-    }).toList();
+    List<Event> eventsForDay = [];
+
+    eventsForDay.addAll(createdEvents.where((event) =>
+    event.date.year == day.year &&
+        event.date.month == day.month &&
+        event.date.day == day.day));
+
+    eventsForDay.addAll(registeredEvents.where((event) =>
+    event.date.year == day.year &&
+        event.date.month == day.month &&
+        event.date.day == day.day));
+
+    return eventsForDay;
   }
 
   @override

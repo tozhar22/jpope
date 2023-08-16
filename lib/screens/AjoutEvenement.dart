@@ -37,6 +37,7 @@ class _AddEventState extends State<AddEvent> {
     if (_formKey.currentState!.validate()) {
       List<String> imageUrls = await uploadImagesToFirebase(multiimages);
 
+      String? userId = AuthenticationService().getCurrentUserId();
       final donneEvenement = {
         'evenementName': EvenementNameController.text,
         'organistorName': OrganistorNameController.text,
@@ -46,9 +47,10 @@ class _AddEventState extends State<AddEvent> {
         'imageUrls': imageUrls,
         'status': 'cree',
         'eventId': '',
+        'registeredCount': 0,
+        'registeredUsers': [],
+        'organizerId': userId,
       };
-
-      String? userId = AuthenticationService().getCurrentUserId();
 
       final collectionEvenement = FirebaseFirestore.instance
           .collection('User')

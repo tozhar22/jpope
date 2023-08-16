@@ -1,48 +1,60 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Event {
-  final String id; // Champ pour l'identifiant unique de l'événement
+  final String id;
   final String evenementName;
+  final String organizerId; // Champ pour l'ID de l'utilisateur créateur
   final String organizerName;
   final String description;
   final String region;
   final Timestamp timestamp;
   final List<String> imageUrls;
-  String status; // Champ pour indiquer le statut de l'événement (cree ou publie)
+  String status;
+  int registeredCount;
+  List<String> registeredUsers;
 
   Event({
-    required this.id, // Ajout du champ id
+    required this.id,
     required this.evenementName,
+    required this.organizerId,
     required this.organizerName,
     required this.description,
     required this.region,
     required this.timestamp,
     required this.imageUrls,
-    required this.status, // Ajout du champ status
+    required this.status,
+    required this.registeredCount,
+    required this.registeredUsers,
   });
 
   factory Event.fromFirestore(String id, Map<String, dynamic> data) {
     return Event(
-      id: id, // Utilisation de l'identifiant passé en argument
+      id: id,
       evenementName: data['evenementName'],
-      organizerName: data['organistorName'],
-      description: data['description'],
-      region: data['region'],
-      timestamp: data['datetime'],
-      imageUrls: List<String>.from(data['imageUrls']),
-      status: data['status'], // Récupération du champ status
+      organizerId: data.containsKey('organizerId') ? data['organizerId'] as String : '',
+      organizerName: data.containsKey('organistorName') ? data['organistorName'] as String : '',
+      description: data.containsKey('description') ? data['description'] as String : '',
+      region: data.containsKey('region') ? data['region'] as String : '',
+      timestamp: data.containsKey('datetime') ? data['datetime'] as Timestamp : Timestamp.now(),
+      imageUrls: data.containsKey('imageUrls') ? List<String>.from(data['imageUrls']) : [],
+      status: data.containsKey('status') ? data['status'] as String : '',
+      registeredCount: data.containsKey('registeredCount') ? data['registeredCount'] as int : 0,
+      registeredUsers: data.containsKey('registeredUsers') ? List<String>.from(data['registeredUsers']) : [],
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'evenementName': evenementName,
+      'organizerId': organizerId,
       'organizerName': organizerName,
       'description': description,
       'region': region,
       'timestamp': timestamp,
       'imageUrls': imageUrls,
-      'status': status, // Ajout du champ status
+      'status': status,
+      'registeredCount': registeredCount,
+      'registeredUsers': registeredUsers,
     };
   }
 
