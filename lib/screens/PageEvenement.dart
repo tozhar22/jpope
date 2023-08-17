@@ -1,11 +1,16 @@
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:jpope/screens/AjoutEvenement.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share/share.dart';
 import '../models/Event.dart';
 import '../services/FirebaseAuthServices.dart';
 import 'DetailEvents.dart';
 import 'EditEvent.dart';
+import 'dart:io';
 
 class PageEvenement extends StatefulWidget {
   const PageEvenement({Key? key}) : super(key: key);
@@ -43,6 +48,37 @@ class _PageEvenementState extends State<PageEvenement> {
       });
     } catch (e) {
       print("Erreur lors de la récupération des événements : $e");
+    }
+  }
+
+
+  Future<void> shareEvent(Event event) async {
+    try {
+      // Créer le contenu à partager
+      String shareText = "Découvrez l'événement : ${event.evenementName}\n\n"
+          "Organisé par : ${event.organizerName}\n"
+          "Description de l'événement : ${event.description}\n\n"
+          "Cliquer sur ce lien pour installer l'application et pour s'inscrire à cet évenement : 'https://ipnetuniversity.com/#/projets'";
+
+      // Récupérer la première URL d'image de l'événement (si disponible)
+      String imageUrl = event.imageUrls.isNotEmpty ? event.imageUrls[0] : '';
+
+      // Vérifier si une URL d'image est disponible
+      if (imageUrl.isNotEmpty) {
+        // Télécharger l'image à partir de l'URL et la stocker temporairement
+        final ByteData imageData = await NetworkAssetBundle(Uri.parse(imageUrl)).load("");
+        final Uint8List bytes = Uint8List.view(imageData.buffer);
+        final File tempFile = await File('${(await getTemporaryDirectory()).path}/temp_event_image.png').create();
+        await tempFile.writeAsBytes(bytes);
+
+        // Partager le contenu avec l'image et la description
+        await Share.shareFiles([tempFile.path], text: shareText, subject: event.evenementName);
+      } else {
+        // Partager le contenu sans image
+        await Share.share(shareText, subject: event.evenementName);
+      }
+    } catch (e) {
+      print("Erreur lors du partage de l'événement : $e");
     }
   }
 
@@ -199,7 +235,7 @@ class _PageEvenementState extends State<PageEvenement> {
                           } else if (result == 'Supprimer') {
                             confirmDelete(events[index]);
                           } else if (result == 'Partager') {
-                            // Handle share option here
+                            shareEvent(events[index]);
                           } else if (result == 'Publier') {
                             await publishEvent(events[index]);
                           } else if (result == 'Dépublier') {

@@ -287,6 +287,7 @@ class _EditEventState extends State<EditEvent> {
                             .doc(userId)
                             .collection('Evenement_cree');
 
+
                         try {
                           await collectionEvenementCree
                               .doc(widget.event.id)
@@ -295,8 +296,10 @@ class _EditEventState extends State<EditEvent> {
                             'organistorName': OrganistorNameController.text,
                             'description': descriptionController.text,
                             'region': selectRegion,
-                            'date': selectedDateTime,
+                            'datetime': Timestamp.fromDate(selectedDateTime!),
                             'imageUrls': imageUrls,
+                            'status': 'cree',
+                            'eventId': '',
                           });
 
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -313,6 +316,7 @@ class _EditEventState extends State<EditEvent> {
                             ),
                           );
                         } catch (error) {
+                                  print('La modification de l\'événement a échoué $error');
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text(
