@@ -51,9 +51,22 @@ class _AccueilState extends State<Accueil> {
       print("Erreur lors de la récupération des événements publiés : $e");
     }
   }
+  // Méthode pour l'inscription
+
   void _EventInscription(Event event) async {
     try {
       String userId = AuthenticationService().getCurrentUserId();
+
+      // vérification si l'utilisateur c'est dédja inscrit à l'évènement
+
+      bool isAlreadyRegistered = event.registeredUsers.contains(userId);
+
+      if (isAlreadyRegistered) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Vous êtes déjà inscrit à cet événement')),
+        );
+        return;
+      }
 
       // Mettre à jour les champs registeredCount et registeredUsers de l'événement
       DocumentReference eventRef = FirebaseFirestore.instance
@@ -64,10 +77,14 @@ class _AccueilState extends State<Accueil> {
 
       await eventRef.update({
         'registeredCount': FieldValue.increment(1),
+      });
+
+      // Ajouter l'utilisateur à la liste des inscrits
+      await eventRef.update({
         'registeredUsers': FieldValue.arrayUnion([userId]),
       });
 
-      // Ajouter les informations de l'événement à la sous-collection de l'utilisateur inscrit
+      // Ajout des informations de l'événement à la sous-collection de l'utilisateur inscrit
       DocumentReference userEventRef = FirebaseFirestore.instance
           .collection('User')
           .doc(userId)
