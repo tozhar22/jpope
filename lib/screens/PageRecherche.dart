@@ -24,6 +24,7 @@ class _SearchState extends State<Search> {
     super.initState();
     fetchEvents();
   }
+
   Future<void> fetchEvents() async {
     try {
       String userId = AuthenticationService().getCurrentUserId();
@@ -35,7 +36,8 @@ class _SearchState extends State<Search> {
           .get();
 
       List<Event> fetchedEvents = eventSnapshot.docs.map((doc) =>
-          Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>)).toList();
+          Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>))
+          .toList();
 
       fetchedEvents.sort((a, b) => a.date.compareTo(b.date));
 
@@ -51,7 +53,8 @@ class _SearchState extends State<Search> {
     setState(() {
       filteredEvents = events.where((event) =>
       event.evenementName.toLowerCase().contains(query.toLowerCase()) ||
-          event.organizerName.toLowerCase().contains(query.toLowerCase())).toList();
+          event.organizerName.toLowerCase().contains(query.toLowerCase()))
+          .toList();
     });
   }
 
@@ -73,7 +76,6 @@ class _SearchState extends State<Search> {
                 labelText: 'Rechercher un événement',
                 suffixIcon: IconButton(
                   onPressed: () {
-                    // Déclencher la recherche ici
                     _filterEvents(_searchController.text);
                   },
                   icon: Icon(Icons.search),
@@ -93,7 +95,8 @@ class _SearchState extends State<Search> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => EventDetailsPage(event: events[index]),
+                        builder: (context) =>
+                            EventDetailsPage(event: filteredEvents[index]),
                       ),
                     );
                   },

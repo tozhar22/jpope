@@ -20,80 +20,8 @@ class _AuthentificationState extends State<Authentification> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-_showSuccessDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return const AlertDialog(
-        title: Text('Connexion réussie'),
-        content: Text('Félicitations ! Votre connexion s\'est bien déroulée.'),
-      );
-    },
-  ).then((_) {
-    // Ferme automatiquement la boîte de dialogue après 1 seconde.
-    Future.delayed(Duration(milliseconds: 8), () {
-      Navigator.of(context).pop(); // Ferme automatiquement la boîte de dialogue.
-    });
-  });
-}
 
-_showUserNotFound(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Compte introuvable'),
-        content: Text('Aucun compte n\'est associé à cet e-mail. Veuillez vous inscrire avant de vous connecter.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text('Fermer'),
-          ),
-        ],
-      );
-    },
-  );
-}
-_showNetworkError(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Problème de connexion'),
-        content: Text('Pas de connexion.Veuillez réessayer plus tard'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text('Fermer'),
-          ),
-        ],
-      );
-    },
-  );
-}
-_showErroDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Identifiants incorrects'),
-        content: Text('Nom d’utilisateur ou mot de passe incorrect'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text('Fermer'),
-          ),
-        ],
-      );
-    },
-  );
-}
+
 
   @override
   Widget build(BuildContext context) {

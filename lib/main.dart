@@ -4,9 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:jpope/models/user.dart';
 import 'package:jpope/services/FirebaseAuthServices.dart';
 import 'package:provider/provider.dart';
-
 import 'firebase_options.dart';
 import 'models/SplashScreenWrapper.dart';
+import 'models/event_state.dart';
+
 
 void main() async {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
@@ -15,7 +16,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(
-    // Utilisez un Builder pour s'assurer que le StreamProvider est initialisé
+        // Utilisez un Builder pour s'assurer que le StreamProvider est initialisé
     Builder(
       builder: (context) {
         return const MyApp();

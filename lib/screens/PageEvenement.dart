@@ -58,7 +58,7 @@ class _PageEvenementState extends State<PageEvenement> {
       String shareText = "Découvrez l'événement : ${event.evenementName}\n\n"
           "Organisé par : ${event.organizerName}\n"
           "Description de l'événement : ${event.description}\n\n"
-          "Cliquer sur ce lien pour installer l'application et pour s'inscrire à cet évenement : 'https://ipnetuniversity.com/#/projets'";
+          "Cliquer sur ce lien pour installer l'application et pour s'inscrire à cet évenement : https://ipnetuniversity.com/#/projets";
 
       // Récupérer la première URL d'image de l'événement (si disponible)
       String imageUrl = event.imageUrls.isNotEmpty ? event.imageUrls[0] : '';
