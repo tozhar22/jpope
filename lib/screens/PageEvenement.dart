@@ -21,7 +21,7 @@ class PageEvenement extends StatefulWidget {
 
 class _PageEvenementState extends State<PageEvenement> {
   late List<Event> events = [];
-
+  bool _isLoading = false;
   @override
   void initState() {
     super.initState();
@@ -53,6 +53,11 @@ class _PageEvenementState extends State<PageEvenement> {
 
 
   Future<void> shareEvent(Event event) async {
+    // Activation de l'état de chargement
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       // Créer le contenu à partager
       String shareText = "Découvrez l'événement : ${event.evenementName}\n\n"
@@ -77,8 +82,14 @@ class _PageEvenementState extends State<PageEvenement> {
         // Partager le contenu sans image
         await Share.share(shareText, subject: event.evenementName);
       }
+      setState(() {
+        _isLoading = false;
+      });
     } catch (e) {
       print("Erreur lors du partage de l'événement : $e");
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -179,129 +190,142 @@ class _PageEvenementState extends State<PageEvenement> {
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: _refreshEvents,
-        child: ListView.builder(
-          itemCount: events.length,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EventDetailsPage(event: events[index]),
-                  ),
-                );
-              },
-              child: Card(
-                elevation: 2,
-                margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
+        child: Stack(
+          children: [RefreshIndicator(
+            onRefresh: _refreshEvents,
+            child: ListView.builder(
+              itemCount: events.length,
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EventDetailsPage(event: events[index]),
+                      ),
+                    );
+                  },
+                  child: Card(
+                    elevation: 2,
+                    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          events[index].imageUrls.isNotEmpty
-                              ? ClipRRect(
-                            borderRadius: BorderRadius.circular(8.0),
-                            child: CachedNetworkImage(
-                              imageUrl: events[index].imageUrls[0],
-                              width: 90,
-                              height: 90,
-                              fit: BoxFit.cover,
-                            ),
-                          )
-                              : SizedBox.shrink(),
-                          SizedBox(width: 15),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          Row(
                             children: [
-                              Text(events[index].evenementName),
-                              SizedBox(height: 8,),
-                              Text(events[index].organizerName),
+                              events[index].imageUrls.isNotEmpty
+                                  ? ClipRRect(
+                                borderRadius: BorderRadius.circular(8.0),
+                                child: CachedNetworkImage(
+                                  imageUrl: events[index].imageUrls[0],
+                                  width: 90,
+                                  height: 90,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                                  : SizedBox.shrink(),
+                              SizedBox(width: 15),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(events[index].evenementName),
+                                  const SizedBox(height: 8,),
+                                  Text(events[index].organizerName),
+                                ],
+                              ),
                             ],
+                          ),
+                          PopupMenuButton<String>(
+                            onSelected: (String result) async {
+                              if (result == 'Modifier') {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EditEvent(event: events[index]),
+                                  ),
+                                );
+                              } else if (result == 'Supprimer') {
+                                confirmDelete(events[index]);
+                              } else if (result == 'Partager') {
+                                await shareEvent(events[index]);
+                              } else if (result == 'Publier') {
+                                await publishEvent(events[index]);
+                              } else if (result == 'Dépublier') {
+                                await unpublishEvent(events[index]);
+                              }
+                            },
+                            itemBuilder: (BuildContext context) {
+                              List<PopupMenuEntry<String>> menuItems = [];
+                              menuItems.add(
+                                const PopupMenuItem<String>(
+                                  value: 'Modifier',
+                                  child: ListTile(
+                                    leading: Icon(Icons.edit, color: Color(0xFF2196F3)),
+                                    title: Text('Modifier'),
+                                  ),
+                                ),
+                              );
+                              menuItems.add(
+                                const PopupMenuItem<String>(
+                                  value: 'Supprimer',
+                                  child: ListTile(
+                                    leading: Icon(Icons.delete, color: Color(0xFF2196F3)),
+                                    title: Text('Supprimer'),
+                                  ),
+                                ),
+                              );
+                              menuItems.add(
+                                const PopupMenuItem<String>(
+                                  value: 'Partager',
+                                  child: ListTile(
+                                    leading: Icon(Icons.share, color: Color(0xFF2196F3)),
+                                    title: Text('Partager'),
+                                  ),
+                                ),
+                              );
+
+                              if (events[index].status == 'cree') {
+                                menuItems.add(
+                                  const PopupMenuItem<String>(
+                                    value: 'Publier',
+                                    child: ListTile(
+                                      leading: Icon(Icons.publish, color: Color(0xFF2196F3)),
+                                      title: Text('Publier'),
+                                    ),
+                                  ),
+                                );
+                              } else if (events[index].status == 'Publier') {
+                                menuItems.add(
+                                  const PopupMenuItem<String>(
+                                    value: 'Dépublier',
+                                    child: ListTile(
+                                      leading: Icon(Icons.cancel, color: Colors.red),
+                                      title: Text('Dépublier'),
+                                    ),
+                                  ),
+                                );
+                              }
+                              return menuItems;
+                            },
                           ),
                         ],
                       ),
-                      PopupMenuButton<String>(
-                        onSelected: (String result) async {
-                          if (result == 'Modifier') {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => EditEvent(event: events[index]),
-                              ),
-                            );
-                          } else if (result == 'Supprimer') {
-                            confirmDelete(events[index]);
-                          } else if (result == 'Partager') {
-                            shareEvent(events[index]);
-                          } else if (result == 'Publier') {
-                            await publishEvent(events[index]);
-                          } else if (result == 'Dépublier') {
-                            await unpublishEvent(events[index]);
-                          }
-                        },
-                        itemBuilder: (BuildContext context) {
-                          List<PopupMenuEntry<String>> menuItems = [];
-                          menuItems.add(
-                            const PopupMenuItem<String>(
-                              value: 'Modifier',
-                              child: ListTile(
-                                leading: Icon(Icons.edit, color: Color(0xFF2196F3)),
-                                title: Text('Modifier'),
-                              ),
-                            ),
-                          );
-                          menuItems.add(
-                            const PopupMenuItem<String>(
-                              value: 'Supprimer',
-                              child: ListTile(
-                                leading: Icon(Icons.delete, color: Color(0xFF2196F3)),
-                                title: Text('Supprimer'),
-                              ),
-                            ),
-                          );
-                          menuItems.add(
-                            const PopupMenuItem<String>(
-                              value: 'Partager',
-                              child: ListTile(
-                                leading: Icon(Icons.share, color: Color(0xFF2196F3)),
-                                title: Text('Partager'),
-                              ),
-                            ),
-                          );
-
-                          if (events[index].status == 'cree') {
-                            menuItems.add(
-                              const PopupMenuItem<String>(
-                                value: 'Publier',
-                                child: ListTile(
-                                  leading: Icon(Icons.publish, color: Color(0xFF2196F3)),
-                                  title: Text('Publier'),
-                                ),
-                              ),
-                            );
-                          } else if (events[index].status == 'Publier') {
-                            menuItems.add(
-                              const PopupMenuItem<String>(
-                                value: 'Dépublier',
-                                child: ListTile(
-                                  leading: Icon(Icons.cancel, color: Colors.red),
-                                  title: Text('Dépublier'),
-                                ),
-                              ),
-                            );
-                          }
-                          return menuItems;
-                        },
-                      ),
-                    ],
+                    ),
                   ),
+                );
+              },
+            ),
+          ),
+            if (_isLoading)
+              Container(
+                color: Colors.black12.withOpacity(0.8), // Couleur de fond semi-transparente
+                child: Center(
+                  child: CircularProgressIndicator(),
                 ),
               ),
-            );
-          },
+          ]
         ),
       ),
       floatingActionButton: FloatingActionButton(

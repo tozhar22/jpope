@@ -14,6 +14,7 @@ class Accueil extends StatefulWidget {
 
 class _AccueilState extends State<Accueil> {
   late List<Event> publishedEvents = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -35,8 +36,8 @@ class _AccueilState extends State<Accueil> {
             .get();
 
         List<Event> userPublishedEvents = eventSnapshot.docs
-            .map((doc) =>
-              Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>))
+            .map((doc) => Event.fromFirestore(
+            doc.id, doc.data() as Map<String, dynamic>))
             .toList();
 
         allPublishedEvents.addAll(userPublishedEvents);
@@ -46,9 +47,13 @@ class _AccueilState extends State<Accueil> {
 
       setState(() {
         publishedEvents = allPublishedEvents;
+        isLoading = false; // Mettre à jour l'état pour cacher le loader
       });
     } catch (e) {
       print("Erreur lors de la récupération des événements publiés : $e");
+      setState(() {
+        isLoading = false; // Gérer l'état du loader même en cas d'erreur
+      });
     }
   }
   // Méthode pour l'inscription
@@ -179,12 +184,16 @@ class _AccueilState extends State<Accueil> {
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: _refreshEvents,
-        child: ListView.builder(
-          itemCount: publishedEvents.length,
-          itemBuilder: (context, index) {
+        child: isLoading // Vérifier l'état de chargement
+            ?Center(
+              child: CircularProgressIndicator(), // Afficher le loader
+            )
+            : ListView.builder(
+              itemCount: publishedEvents.length,
+              itemBuilder: (context, index) {
             return GestureDetector(
               onTap: () {
-                // Naviguez vers la page de détails de l'événement ici si nécessaire
+                // Naviguer vers la page de détails de l'événement ici si nécessaire
               },
               child: buildEventCard(publishedEvents[index]),
             );
