@@ -115,6 +115,56 @@ class _AccueilState extends State<Accueil> {
       );
     }
   }
+  void _EventDesinscription(Event event) async {
+    try {
+      String userId = AuthenticationService().getCurrentUserId();
+
+      // Vérification si l'utilisateur est inscrit à l'évènement
+      bool isRegistered = event.registeredUsers.contains(userId);
+
+      if (!isRegistered) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Vous n\'êtes pas inscrit à cet événement')),
+        );
+        return;
+      }
+
+      // Mettre à jour les champs registeredCount et registeredUsers de l'événement
+      DocumentReference eventRef = FirebaseFirestore.instance
+          .collection('User')
+          .doc(event.organizerId)
+          .collection('Evenement')
+          .doc(event.id);
+
+      await eventRef.update({
+        'registeredCount': FieldValue.increment(-1),
+      });
+
+      // Retirer l'utilisateur de la liste des inscrits
+      await eventRef.update({
+        'registeredUsers': FieldValue.arrayRemove([userId]),
+      });
+
+      // Suppression des informations de l'événement de la sous-collection de l'utilisateur inscrit
+      DocumentReference userEventRef = FirebaseFirestore.instance
+          .collection('User')
+          .doc(userId)
+          .collection('EvenementsInscrits')
+          .doc(event.id);
+
+      await userEventRef.delete();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Désinscription réussie')),
+      );
+    } catch (e) {
+      print("Erreur lors de la désinscription à l'événement : $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur lors de la désinscription')),
+      );
+    }
+  }
+
   Widget buildEventCard(Event event) {
     return Card(
       margin: EdgeInsets.all(8),
@@ -155,9 +205,19 @@ class _AccueilState extends State<Accueil> {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  _EventInscription(event);
+                  if (event.registeredUsers.contains(
+                      AuthenticationService().getCurrentUserId())) {
+                    _EventDesinscription(event);
+                  } else {
+                    _EventInscription(event);
+                  }
                 },
-                child: Text('S\'inscrire'),
+                child: Text(
+                  event.registeredUsers.contains(
+                      AuthenticationService().getCurrentUserId())
+                      ? 'Se désinscrire'
+                      : 'S\'inscrire',
+                ),
               ),
               TextButton(
                 onPressed: () {
