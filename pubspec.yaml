@@ -72,6 +72,13 @@ flutter_native_splash:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.13.1"
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: false
+  image_path: "assets/images/lg.png"
+  min_sdk_android: 19 # android min sdk min:16, default 21
 
 
   # The "flutter_lints" package below contains a set of recommended lints to
