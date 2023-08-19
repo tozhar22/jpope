@@ -6,7 +6,6 @@ import 'package:jpope/services/FirebaseAuthServices.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'models/SplashScreenWrapper.dart';
-import 'models/event_state.dart';
 
 
 void main() async {

@@ -24,7 +24,7 @@ class _InscriptionState extends State<Inscription> {
   final passwordController = TextEditingController();
 
 
-
+  // Méthode pour le nom utilisateur dédja pris
   Future<bool> isUsernameTaken(String username) async {
     try {
       final QuerySnapshot userSnapshot = await FirebaseFirestore.instance
@@ -198,11 +198,6 @@ class _InscriptionState extends State<Inscription> {
                               'userName': userName,
                               'password' : password,
                             });
-
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (context) => ApplicationInterface()),
-                            );
                             showDialog (
                               context: context,
                               builder: (BuildContext context) {
@@ -212,6 +207,15 @@ class _InscriptionState extends State<Inscription> {
                                 );
                               },
                             );
+
+                            await Future.delayed(const Duration(seconds: 1));
+                            Navigator.of(context).pop();
+
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => ApplicationInterface()),
+                            );
+
 
                           }
                         } catch (e) {

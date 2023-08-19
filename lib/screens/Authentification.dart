@@ -1,5 +1,4 @@
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:jpope/screens/inscription.dart';
 
@@ -108,26 +107,26 @@ class _AuthentificationState extends State<Authentification> {
                           AppUser? result = await _auth.signInWithEmailAndPassword(context, email, password);
                           if (result != null) {
 
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (context) => ApplicationInterface()), // Remplacez 'HomePage' par le nom de votre page
-                            );
-                            final alertDialogKey = GlobalKey<State>();
-
                             showDialog (
                               context: context,
                               builder: (BuildContext context) {
                                 return const AlertDialog(
                                   title: Text('Connexion réussie'),
                                   content: Text('Vous êtes maintenant connecté.'),
-                                );
-                              },
-                            ).then((_) {
-                              // Ferme automatiquement la boîte de dialogue après 1 seconde.
-                              Future.delayed(Duration(seconds: 1), () async{
-                                Navigator.of(context).pop(); // Ferme automatiquement la boîte de dialogue.
-                              });
-                            });
+                                  );
+                                },
+                              );
+
+                            await Future.delayed(const Duration(seconds: 1));
+                            Navigator.of(context).pop();
+
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => ApplicationInterface()), // Remplacez 'HomePage' par le nom de votre page
+                            );
+
+
+                            final alertDialogKey = GlobalKey<State>();
                           }
 
                         }catch (e) {
