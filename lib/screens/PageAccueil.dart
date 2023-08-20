@@ -12,10 +12,10 @@ class Accueil extends StatefulWidget {
   State<Accueil> createState() => _AccueilState();
 }
 
-class _AccueilState extends State<Accueil> {
+class _AccueilState extends State<Accueil> with AutomaticKeepAliveClientMixin{
   late List<Event> publishedEvents = [];
   bool isLoading = true;
-
+  bool get wantKeepAlive => true;
   @override
   void initState() {
     super.initState();
@@ -244,6 +244,7 @@ class _AccueilState extends State<Accueil> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: _refreshEvents,

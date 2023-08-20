@@ -14,8 +14,8 @@ class Search extends StatefulWidget {
 }
 
 class _SearchState extends State<Search> {
-  late List<Event> events = []; // Remplacez par votre liste d'événements
-  List<Event> filteredEvents = []; // Liste filtrée à afficher
+  late List<Event> events = [];
+  List<Event> filteredEvents = [];
   TextEditingController _searchController = TextEditingController();
 
   @override
