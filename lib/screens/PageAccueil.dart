@@ -101,7 +101,8 @@ class _AccueilState extends State<Accueil> {
         'organizerName': event.organizerName,
         'imageUrls': event.imageUrls,
         'description': event.description,
-        'region': event.region,
+        'ville': event.ville,
+        'lieu': event.lieu,
         'datetime': event.timestamp,
       });
 

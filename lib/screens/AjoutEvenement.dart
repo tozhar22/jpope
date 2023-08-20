@@ -18,9 +18,10 @@ class _AddEventState extends State<AddEvent> {
   final EvenementNameController = TextEditingController();
   final OrganistorNameController = TextEditingController();
   final descriptionController = TextEditingController();
+  final lieuController = TextEditingController();
   DateTime? selectedDateTime; // Store selected date and time
 
-  String selectRegion = 'region maritime';
+  String selectVille = 'Lome';
 
   final ImagePicker _imagePicker = ImagePicker();
   List<File> multiimages = [];
@@ -42,7 +43,8 @@ class _AddEventState extends State<AddEvent> {
         'evenementName': EvenementNameController.text,
         'organistorName': OrganistorNameController.text,
         'description': descriptionController.text,
-        'region': selectRegion,
+        'ville': selectVille,
+        'lieu': lieuController.text,
         'datetime': Timestamp.fromDate(selectedDateTime!),
         'imageUrls': imageUrls,
         'status': 'cree',
@@ -105,6 +107,7 @@ class _AddEventState extends State<AddEvent> {
     EvenementNameController.dispose();
     OrganistorNameController.dispose();
     descriptionController.dispose();
+    lieuController.dispose();
     super.dispose();
   }
 
@@ -174,31 +177,58 @@ class _AddEventState extends State<AddEvent> {
                     controller: descriptionController,
                   ),
                   const SizedBox(height: 25,),
-                  DropdownButtonFormField(
-                      items: const [
-                        DropdownMenuItem(
-                            value: 'region maritime', child: Text("Maritime")),
-                        DropdownMenuItem(
-                            value: 'region des Plateaux', child: Text("Plateaux")),
-                        DropdownMenuItem(
-                            value: 'region centrale', child: Text("Centrale")),
-                        DropdownMenuItem(
-                            value: 'region de la Kara', child: Text("Kara")),
-                        DropdownMenuItem(
-                            value: 'region de la savane', child: Text("Savane"))
-                      ],
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder()
-                      ),
-                      value: selectRegion,
-                      onChanged: (value) {
-                        setState(() {
-                          selectRegion = value!;
-                        });
-                      }
+                  DropdownButtonFormField<String>(
+                    items: const [
+                      DropdownMenuItem(value: 'Lome', child: Text("Lome")),
+                      DropdownMenuItem(value: 'Kara', child: Text("Kara")),
+                      DropdownMenuItem(value: 'Atakpamé', child: Text("Atakpamé")),
+                      DropdownMenuItem(value: 'Bassar', child: Text("Bassar")),
+                      DropdownMenuItem(value: 'Tsévié', child: Text("Tsévié")),
+                      DropdownMenuItem(value: 'Aného', child: Text("Aného")),
+                      DropdownMenuItem(value: 'Dapaong', child: Text("Dapaong")),
+                      DropdownMenuItem(value: 'Tchamba', child: Text("Tchamba")),
+                      DropdownMenuItem(value: 'Notsé', child: Text("Notsé")),
+                      DropdownMenuItem(value: 'Sotouboua', child: Text("Sotouboua")),
+                      DropdownMenuItem(value: 'Vogan', child: Text("Vogan")),
+                      DropdownMenuItem(value: 'Biankouri', child: Text("Biankouri")),
+                      DropdownMenuItem(value: 'Tabligbo', child: Text("Tabligbo")),
+                      DropdownMenuItem(value: 'Amlamé', child: Text("Amlamé")),
+                      DropdownMenuItem(value: 'Galangachi', child: Text("Galangachi")),
+                      DropdownMenuItem(value: 'Kpagouda', child: Text("Kpagouda")),
+                      DropdownMenuItem(value: 'Sokodé', child: Text("Sokodé")),
+                      DropdownMenuItem(value: 'Kpalimé', child: Text("Kpalimé")),
+                      DropdownMenuItem(value: 'Mango', child: Text("Mango")),
+                      DropdownMenuItem(value: 'Niamtougou', child: Text("Niamtougou")),
+                      DropdownMenuItem(value: 'Badou', child: Text("Badou")),
+                      DropdownMenuItem(value: 'Bafilo', child: Text("Bafilo")),
+                      DropdownMenuItem(value: 'Kandé', child: Text("Kandé")),
+                    ],
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                    ),
+                    value: selectVille,
+                    onChanged: (value) {
+                      setState(() {
+                        selectVille = value!;
+                      });
+                    },
                   ),
                   const SizedBox(height: 25,),
-
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: "Lieu",
+                        hintText: "Saisir le lieu de l'évènement",
+                        border: OutlineInputBorder()
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return ("Vous devez compléter ce champ");
+                      }
+                      return null;
+                    },
+                    controller: lieuController,
+                  ),
+                  const SizedBox(height: 25,),
                   TextFormField(
                     controller: TextEditingController(
                       text: selectedDateTime != null

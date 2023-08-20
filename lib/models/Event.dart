@@ -6,7 +6,8 @@ class Event {
   final String organizerId; // Champ pour l'ID de l'utilisateur créateur
   final String organizerName;
   final String description;
-  final String region;
+  final String ville;
+  final String lieu;
   final Timestamp timestamp;
   final List<String> imageUrls;
   String status;
@@ -19,7 +20,8 @@ class Event {
     required this.organizerId,
     required this.organizerName,
     required this.description,
-    required this.region,
+    required this.ville,
+    required this.lieu,
     required this.timestamp,
     required this.imageUrls,
     required this.status,
@@ -34,7 +36,8 @@ class Event {
       organizerId: data.containsKey('organizerId') ? data['organizerId'] as String : '',
       organizerName: data.containsKey('organistorName') ? data['organistorName'] as String : '',
       description: data.containsKey('description') ? data['description'] as String : '',
-      region: data.containsKey('region') ? data['region'] as String : '',
+      ville: data.containsKey('ville') ? data['ville'] as String : '',
+      lieu: data.containsKey('lieu') ? data['lieu'] as String : '',
       timestamp: data.containsKey('datetime') ? data['datetime'] as Timestamp : Timestamp.now(),
       imageUrls: data.containsKey('imageUrls') ? List<String>.from(data['imageUrls']) : [],
       status: data.containsKey('status') ? data['status'] as String : '',
@@ -49,7 +52,8 @@ class Event {
       'organizerId': organizerId,
       'organizerName': organizerName,
       'description': description,
-      'region': region,
+      'ville': ville,
+      'lieu': lieu,
       'timestamp': timestamp,
       'imageUrls': imageUrls,
       'status': status,

@@ -41,6 +41,17 @@ class MoreInfoDialog extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(
+              Icons.location_city,
+              color: Colors.blue,
+            ),
+            title: const Text(
+              'Ville:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(event.ville),
+          ),
+          ListTile(
+            leading: const Icon(
               Icons.location_on,
               color: Colors.blue,
             ),
@@ -48,7 +59,7 @@ class MoreInfoDialog extends StatelessWidget {
               'Lieu:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            subtitle: Text(event.region),
+            subtitle: Text(event.lieu),
           ),
           // Ajoutez d'autres informations ici selon votre modèle Event
         ],

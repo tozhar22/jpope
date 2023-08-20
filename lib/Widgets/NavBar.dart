@@ -34,7 +34,7 @@ class NavBar extends StatelessWidget {
             ),
             onTap: () => null,
           ),
-          const Divider(),
+          Divider(color: Colors.blueAccent),
           ListTile(
             leading: Icon(Icons.info),
             title: Text(
@@ -43,7 +43,8 @@ class NavBar extends StatelessWidget {
             ),
             onTap: () => null,
           ),
-          if (isAdmin) // Add the admin-specific option if isAdmin is true
+          Divider(color: Colors.blueAccent),//
+          if (isAdmin)
             ListTile(
               leading: Icon(Icons.admin_panel_settings),
               title: Text(
@@ -53,8 +54,8 @@ class NavBar extends StatelessWidget {
               onTap: () {
                 // Handle admin-specific action
               },
-            ),
-          Divider(),
+            )
+          ,
           ListTile(
             leading: Icon(Icons.person_off_rounded),
             title: Text(

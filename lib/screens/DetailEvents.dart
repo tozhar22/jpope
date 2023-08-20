@@ -42,7 +42,11 @@ class EventDetailsPage extends StatelessWidget {
                 style: const TextStyle(fontSize: 18.0, color: Colors.grey),
               ),
               Text(
-                'Région: ${event.region}',
+                'ville: ${event.ville}',
+                style: const TextStyle(fontSize: 18.0, color: Colors.grey),
+              ),
+              Text(
+                'Lieu: ${event.lieu}',
                 style: const TextStyle(fontSize: 18.0, color: Colors.grey),
               ),
               const SizedBox(height: 16.0),
