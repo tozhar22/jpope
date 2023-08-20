@@ -109,6 +109,7 @@ class _AccueilState extends State<Accueil> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Inscription réussie')),
       );
+      await _refreshEvents();
     } catch (e) {
       print("Erreur lors de l'inscription à l'événement : $e");
       ScaffoldMessenger.of(context).showSnackBar(
@@ -158,6 +159,7 @@ class _AccueilState extends State<Accueil> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Désinscription réussie')),
       );
+      await _refreshEvents();
     } catch (e) {
       print("Erreur lors de la désinscription à l'événement : $e");
       ScaffoldMessenger.of(context).showSnackBar(

@@ -18,9 +18,9 @@ class ApplicationInterface extends StatefulWidget {
 class _ApplicationInterfaceState extends State<ApplicationInterface> {
   final PageController _pageController = PageController(initialPage: 0);
   int _currentIndex = 0;
-   String _name = "Admin";
-   String _email = "admin@gmail.com";
-   bool _isAdmin = false;
+  String _name = "Admin";
+  String _email = "admin@gmail.com";
+  bool _isAdmin = false;
   @override
   void initState() {
     super.initState();
@@ -59,11 +59,7 @@ class _ApplicationInterfaceState extends State<ApplicationInterface> {
   _onBottomNavItemTapped(int index) {
     setState(() {
       _currentIndex = index;
-      _pageController.animateToPage(
-        index,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-      );
+      _pageController.jumpToPage(index);
     });
   }
 
