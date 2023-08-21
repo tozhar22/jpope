@@ -1,12 +1,12 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:intl/intl.dart';
 import '../models/Event.dart';
 import '../services/FirebaseAuthServices.dart';
-import 'PageEvenement.dart';
 
 class EditEvent extends StatefulWidget {
   final Event event;
@@ -18,6 +18,7 @@ class EditEvent extends StatefulWidget {
 }
 
 class _EditEventState extends State<EditEvent> {
+  late Event editedEvent;
   late List<Event> events = [];
   final _formKey = GlobalKey<FormState>();
   final EvenementNameController = TextEditingController();
@@ -61,11 +62,12 @@ class _EditEventState extends State<EditEvent> {
   }
 
   Future<void> multiImagePicker() async {
-    final List<XFile> pickedImages = await _imagePicker.pickMultiImage();
-    pickedImages.forEach((image) {
-      multiimages.add(File(image.path));
-    });
-    setState(() {});
+    final pickedImages = await _imagePicker.pickMultiImage();
+    if (pickedImages != null) {
+      setState(() {
+        multiimages.addAll(pickedImages.map((image) => File(image.path)));
+      });
+    }
   }
 
   Future<List<String>> uploadImagesToFirebase(List<File> images) async {
@@ -90,13 +92,16 @@ class _EditEventState extends State<EditEvent> {
   }
 
   void loadEventData() {
-    EvenementNameController.text = widget.event.evenementName;
-    OrganistorNameController.text = widget.event.organizerName;
-    descriptionController.text = widget.event.description;
-    lieuController.text = widget.event.lieu;
-    currentImageUrls.addAll(widget.event.imageUrls);
-    selectedDateTime = widget.event.date;
-    selectVille = widget.event.ville;
+    editedEvent = widget.event; // Initialize editedEvent with the event data
+    EvenementNameController.text = editedEvent.evenementName;
+    OrganistorNameController.text = editedEvent.organizerName;
+    descriptionController.text = editedEvent.description;
+    lieuController.text = editedEvent.lieu;
+    currentImageUrls.addAll(editedEvent.imageUrls);
+    selectedDateTime = editedEvent.date;
+    selectVille = editedEvent.ville;
+    multiimages.addAll(editedEvent.imageUrls.map((imageUrl) => File(imageUrl)));
+
     fetchEvents();
   }
 
@@ -152,13 +157,14 @@ class _EditEventState extends State<EditEvent> {
                         hintText: "Saisir le nom de l'Evenement",
                         border: OutlineInputBorder()
                     ),
+                    controller: EvenementNameController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return ("Vous devez compléter ce champ");
                       }
                       return null;
                     },
-                    controller: EvenementNameController
+
                 ),
                 const SizedBox(height: 25,),
                 TextFormField(
@@ -167,13 +173,13 @@ class _EditEventState extends State<EditEvent> {
                       hintText: "Saisir le nom de l'organisateur",
                       border: OutlineInputBorder()
                   ),
+                  controller: OrganistorNameController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return ("Vous devez compléter ce champ");
                     }
                     return null;
                   },
-                  controller: OrganistorNameController,
                 ),
                 const SizedBox(height: 25,),
                 TextFormField(
@@ -183,13 +189,13 @@ class _EditEventState extends State<EditEvent> {
                     hintText: "Saisir la description de l'Événement",
                     border: OutlineInputBorder(),
                   ),
+                  controller: descriptionController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Vous devez compléter ce champ";
                     }
                     return null;
                   },
-                  controller: descriptionController,
                 ),
                 const SizedBox(height: 25,),
                 DropdownButtonFormField<String>(
@@ -302,13 +308,34 @@ class _EditEventState extends State<EditEvent> {
                     ],
                   ),
                 ),
-                // ... display selected images ...
+
+                if (multiimages.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  Wrap(
+                    spacing: 8.0,
+                    runSpacing: 8.0,
+                    children: multiimages.map((imageFile) {
+                      return Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: FileImage(imageFile),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+
+            // ... display selected images ...
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      List<String> imageUrls =
-                      await uploadImagesToFirebase(multiimages);
+                      List<String> imageUrls = await uploadImagesToFirebase(multiimages);
                       updateEventData(imageUrls);
+
 
                       String? userId =
                       AuthenticationService().getCurrentUserId();
@@ -317,21 +344,23 @@ class _EditEventState extends State<EditEvent> {
                             .instance
                             .collection('User')
                             .doc(userId)
-                            .collection('Evenement_cree');
+                            .collection('Evenement');
 
-
+                        print("id de event : ${editedEvent.id}");
                         try {
-                          await collectionEvenementCree
-                              .doc(widget.event.id)
-                              .update({
+                          await collectionEvenementCree.doc(editedEvent.id).update({
                             'evenementName': EvenementNameController.text,
                             'organistorName': OrganistorNameController.text,
                             'description': descriptionController.text,
                             'ville': selectVille,
+                            'lieu': lieuController.text,
                             'datetime': Timestamp.fromDate(selectedDateTime!),
                             'imageUrls': imageUrls,
                             'status': 'cree',
                             'eventId': '',
+                            'registeredCount': 0,
+                            'registeredUsers': [],
+                            'organizerId': userId,
                           });
 
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -341,12 +370,7 @@ class _EditEventState extends State<EditEvent> {
                             ),
                           );
 
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PageEvenement(),
-                            ),
-                          );
+                          Navigator.pop(context, true);
                         } catch (error) {
                                   print('La modification de l\'événement a échoué $error');
                           ScaffoldMessenger.of(context).showSnackBar(

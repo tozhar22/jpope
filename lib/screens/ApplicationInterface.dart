@@ -98,7 +98,23 @@ class _ApplicationInterfaceState extends State<ApplicationInterface> {
         ),
         body: PageView(
           controller: _pageController,
-          onPageChanged: _onBottomNavItemTapped,
+          //onPageChanged: _onBottomNavItemTapped,
+          onPageChanged: (int index) { // Utilize an anonymous function here
+            if (index == 3) { // If the index is for the "Recherche" page
+              // Navigate to the Recherche page directly without changing the current index
+              _pageController.jumpToPage(index);
+            } else {
+              // For other pages, update the current index and navigate accordingly
+              setState(() {
+                _currentIndex = index;
+                _pageController.animateToPage(
+                  index,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeInOut,
+                );
+              });
+            }
+          },
           children: [
             const Accueil(),
             const PageEvenement(),
