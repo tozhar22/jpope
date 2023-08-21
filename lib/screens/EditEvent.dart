@@ -30,6 +30,7 @@ class _EditEventState extends State<EditEvent> {
   final ImagePicker _imagePicker = ImagePicker();
   List<File> multiimages = [];
   List<String> currentImageUrls = [];
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -62,12 +63,11 @@ class _EditEventState extends State<EditEvent> {
   }
 
   Future<void> multiImagePicker() async {
-    final pickedImages = await _imagePicker.pickMultiImage();
-    if (pickedImages != null) {
-      setState(() {
-        multiimages.addAll(pickedImages.map((image) => File(image.path)));
-      });
-    }
+    final List<XFile> pickedImages = await _imagePicker.pickMultiImage();
+    pickedImages.forEach((image) {
+      multiimages.add(File(image.path));
+    });
+    setState(() {});
   }
 
   Future<List<String>> uploadImagesToFirebase(List<File> images) async {
@@ -100,7 +100,7 @@ class _EditEventState extends State<EditEvent> {
     currentImageUrls.addAll(editedEvent.imageUrls);
     selectedDateTime = editedEvent.date;
     selectVille = editedEvent.ville;
-    multiimages.addAll(editedEvent.imageUrls.map((imageUrl) => File(imageUrl)));
+    //multiimages.addAll(editedEvent.imageUrls.map((imageUrl) => File(imageUrl)));
 
     fetchEvents();
   }
@@ -135,280 +135,298 @@ class _EditEventState extends State<EditEvent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          margin: EdgeInsets.all(30),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                const Text(
-                  "MODIFIER L'ÉVÉNEMENT",
-                  style: TextStyle(
-                    fontSize: 24,
-                    color: Color(0xFF2196F3),
-                    fontFamily: 'Russo_One',
+      body: Stack(
+        children: [SingleChildScrollView(
+          child: Container(
+            margin: EdgeInsets.all(30),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  const Text(
+                    "MODIFIER L'ÉVÉNEMENT",
+                    style: TextStyle(
+                      fontSize: 24,
+                      color: Color(0xFF2196F3),
+                      fontFamily: 'Russo_One',
+                    ),
                   ),
-                ),
-                const SizedBox(height: 25,),
-                TextFormField(
+                  const SizedBox(height: 25,),
+                  TextFormField(
+                      decoration: const InputDecoration(
+                          labelText: "Nom de l'Evènement",
+                          hintText: "Saisir le nom de l'Evenement",
+                          border: OutlineInputBorder()
+                      ),
+                      controller: EvenementNameController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return ("Vous devez compléter ce champ");
+                        }
+                        return null;
+                      },
+
+                  ),
+                  const SizedBox(height: 25,),
+                  TextFormField(
                     decoration: const InputDecoration(
-                        labelText: "Nom de l'Evènement",
-                        hintText: "Saisir le nom de l'Evenement",
+                        labelText: "Organisateur",
+                        hintText: "Saisir le nom de l'organisateur",
                         border: OutlineInputBorder()
                     ),
-                    controller: EvenementNameController,
+                    controller: OrganistorNameController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return ("Vous devez compléter ce champ");
                       }
                       return null;
                     },
-
-                ),
-                const SizedBox(height: 25,),
-                TextFormField(
-                  decoration: const InputDecoration(
-                      labelText: "Organisateur",
-                      hintText: "Saisir le nom de l'organisateur",
-                      border: OutlineInputBorder()
                   ),
-                  controller: OrganistorNameController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return ("Vous devez compléter ce champ");
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 25,),
-                TextFormField(
-                  maxLines: 5,
-                  decoration: const InputDecoration(
-                    labelText: "Description de l'Événement",
-                    hintText: "Saisir la description de l'Événement",
-                    border: OutlineInputBorder(),
-                  ),
-                  controller: descriptionController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Vous devez compléter ce champ";
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 25,),
-                DropdownButtonFormField<String>(
-                  items: const [
-                    DropdownMenuItem(value: 'Lome', child: Text("Lome")),
-                    DropdownMenuItem(value: 'Kara', child: Text("Kara")),
-                    DropdownMenuItem(value: 'Atakpamé', child: Text("Atakpamé")),
-                    DropdownMenuItem(value: 'Bassar', child: Text("Bassar")),
-                    DropdownMenuItem(value: 'Tsévié', child: Text("Tsévié")),
-                    DropdownMenuItem(value: 'Aného', child: Text("Aného")),
-                    DropdownMenuItem(value: 'Dapaong', child: Text("Dapaong")),
-                    DropdownMenuItem(value: 'Tchamba', child: Text("Tchamba")),
-                    DropdownMenuItem(value: 'Notsé', child: Text("Notsé")),
-                    DropdownMenuItem(value: 'Sotouboua', child: Text("Sotouboua")),
-                    DropdownMenuItem(value: 'Vogan', child: Text("Vogan")),
-                    DropdownMenuItem(value: 'Biankouri', child: Text("Biankouri")),
-                    DropdownMenuItem(value: 'Tabligbo', child: Text("Tabligbo")),
-                    DropdownMenuItem(value: 'Amlamé', child: Text("Amlamé")),
-                    DropdownMenuItem(value: 'Galangachi', child: Text("Galangachi")),
-                    DropdownMenuItem(value: 'Kpagouda', child: Text("Kpagouda")),
-                    DropdownMenuItem(value: 'Sokodé', child: Text("Sokodé")),
-                    DropdownMenuItem(value: 'Kpalimé', child: Text("Kpalimé")),
-                    DropdownMenuItem(value: 'Mango', child: Text("Mango")),
-                    DropdownMenuItem(value: 'Niamtougou', child: Text("Niamtougou")),
-                    DropdownMenuItem(value: 'Badou', child: Text("Badou")),
-                    DropdownMenuItem(value: 'Bafilo', child: Text("Bafilo")),
-                    DropdownMenuItem(value: 'Kandé', child: Text("Kandé")),
-                  ],
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
-                  value: selectVille,
-                  onChanged: (value) {
-                    setState(() {
-                      selectVille = value!;
-                    });
-                  },
-                ),
-                const SizedBox(height: 25,),
-                TextFormField(
-                  decoration: const InputDecoration(
-                      labelText: "Lieu",
-                      hintText: "Saisir le lieu de l'évènement",
-                      border: OutlineInputBorder()
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return ("Vous devez compléter ce champ");
-                    }
-                    return null;
-                  },
-                  controller: lieuController,
-                ),
-                const SizedBox(height: 25,),
-                TextFormField(
-                  controller: TextEditingController(
-                    text: selectedDateTime != null
-                        ? DateFormat('yyyy-MM-dd HH:mm').format(selectedDateTime!)
-                        : '',
-                  ),
-                  readOnly: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Vous devez compléter ce champ";
-                    }
-                    return null;
-                  },
-                  onTap: () {
-                    showDatePicker(
-                      context: context,
-                      initialDate: selectedDateTime ?? DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2101),
-                    ).then((date) {
-                      if (date != null) {
-                        showTimePicker(
-                          context: context,
-                          initialTime: TimeOfDay.fromDateTime(selectedDateTime ?? DateTime.now()),
-                        ).then((time) {
-                          if (time != null) {
-                            setState(() {
-                              selectedDateTime = DateTime(
-                                date.year,
-                                date.month,
-                                date.day,
-                                time.hour,
-                                time.minute,
-                              );
-                            });
-                          }
-                        });
+                  const SizedBox(height: 25,),
+                  TextFormField(
+                    maxLines: 5,
+                    decoration: const InputDecoration(
+                      labelText: "Description de l'Événement",
+                      hintText: "Saisir la description de l'Événement",
+                      border: OutlineInputBorder(),
+                    ),
+                    controller: descriptionController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Vous devez compléter ce champ";
                       }
-                    });
-                  },
-                  decoration: const InputDecoration(
-                    labelText: "Date et Heure de evenement",
-                    border: OutlineInputBorder(),
+                      return null;
+                    },
                   ),
-                ),
-                const SizedBox(height: 25,),
-                ElevatedButton(
-                  onPressed: () {
-                    multiImagePicker();
-                  },
-                  child: const Row(
-                    children: [
-                      Icon(Icons.photo),
-                      SizedBox(width: 8.0),
-                      Text('Modifier l\'affiche'),
+                  const SizedBox(height: 25,),
+                  DropdownButtonFormField<String>(
+                    items: const [
+                      DropdownMenuItem(value: 'Lome', child: Text("Lome")),
+                      DropdownMenuItem(value: 'Kara', child: Text("Kara")),
+                      DropdownMenuItem(value: 'Atakpamé', child: Text("Atakpamé")),
+                      DropdownMenuItem(value: 'Bassar', child: Text("Bassar")),
+                      DropdownMenuItem(value: 'Tsévié', child: Text("Tsévié")),
+                      DropdownMenuItem(value: 'Aného', child: Text("Aného")),
+                      DropdownMenuItem(value: 'Dapaong', child: Text("Dapaong")),
+                      DropdownMenuItem(value: 'Tchamba', child: Text("Tchamba")),
+                      DropdownMenuItem(value: 'Notsé', child: Text("Notsé")),
+                      DropdownMenuItem(value: 'Sotouboua', child: Text("Sotouboua")),
+                      DropdownMenuItem(value: 'Vogan', child: Text("Vogan")),
+                      DropdownMenuItem(value: 'Biankouri', child: Text("Biankouri")),
+                      DropdownMenuItem(value: 'Tabligbo', child: Text("Tabligbo")),
+                      DropdownMenuItem(value: 'Amlamé', child: Text("Amlamé")),
+                      DropdownMenuItem(value: 'Galangachi', child: Text("Galangachi")),
+                      DropdownMenuItem(value: 'Kpagouda', child: Text("Kpagouda")),
+                      DropdownMenuItem(value: 'Sokodé', child: Text("Sokodé")),
+                      DropdownMenuItem(value: 'Kpalimé', child: Text("Kpalimé")),
+                      DropdownMenuItem(value: 'Mango', child: Text("Mango")),
+                      DropdownMenuItem(value: 'Niamtougou', child: Text("Niamtougou")),
+                      DropdownMenuItem(value: 'Badou', child: Text("Badou")),
+                      DropdownMenuItem(value: 'Bafilo', child: Text("Bafilo")),
+                      DropdownMenuItem(value: 'Kandé', child: Text("Kandé")),
                     ],
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                    ),
+                    value: selectVille,
+                    onChanged: (value) {
+                      setState(() {
+                        selectVille = value!;
+                      });
+                    },
                   ),
-                ),
-
-                if (multiimages.isNotEmpty) ...[
-                  const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 8.0,
-                    runSpacing: 8.0,
-                    children: multiimages.map((imageFile) {
-                      return Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: FileImage(imageFile),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      );
-                    }).toList(),
+                  const SizedBox(height: 25,),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: "Lieu",
+                        hintText: "Saisir le lieu de l'évènement",
+                        border: OutlineInputBorder()
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return ("Vous devez compléter ce champ");
+                      }
+                      return null;
+                    },
+                    controller: lieuController,
                   ),
-                ],
-
-            // ... display selected images ...
-                ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      List<String> imageUrls = await uploadImagesToFirebase(multiimages);
-                      updateEventData(imageUrls);
-
-
-                      String? userId =
-                      AuthenticationService().getCurrentUserId();
-                      if (userId != null) {
-                        final collectionEvenementCree = FirebaseFirestore
-                            .instance
-                            .collection('User')
-                            .doc(userId)
-                            .collection('Evenement');
-
-                        print("id de event : ${editedEvent.id}");
-                        try {
-                          await collectionEvenementCree.doc(editedEvent.id).update({
-                            'evenementName': EvenementNameController.text,
-                            'organistorName': OrganistorNameController.text,
-                            'description': descriptionController.text,
-                            'ville': selectVille,
-                            'lieu': lieuController.text,
-                            'datetime': Timestamp.fromDate(selectedDateTime!),
-                            'imageUrls': imageUrls,
-                            'status': 'cree',
-                            'eventId': '',
-                            'registeredCount': 0,
-                            'registeredUsers': [],
-                            'organizerId': userId,
+                  const SizedBox(height: 25,),
+                  TextFormField(
+                    controller: TextEditingController(
+                      text: selectedDateTime != null
+                          ? DateFormat('yyyy-MM-dd HH:mm').format(selectedDateTime!)
+                          : '',
+                    ),
+                    readOnly: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Vous devez compléter ce champ";
+                      }
+                      return null;
+                    },
+                    onTap: () {
+                      showDatePicker(
+                        context: context,
+                        initialDate: selectedDateTime ?? DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2101),
+                      ).then((date) {
+                        if (date != null) {
+                          showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.fromDateTime(selectedDateTime ?? DateTime.now()),
+                          ).then((time) {
+                            if (time != null) {
+                              setState(() {
+                                selectedDateTime = DateTime(
+                                  date.year,
+                                  date.month,
+                                  date.day,
+                                  time.hour,
+                                  time.minute,
+                                );
+                              });
+                            }
                           });
+                        }
+                      });
+                    },
+                    decoration: const InputDecoration(
+                      labelText: "Date et Heure de evenement",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 25,),
+                  ElevatedButton(
+                    onPressed: () {
+                      multiImagePicker();
+                    },
+                    child: const Row(
+                      children: [
+                        Icon(Icons.photo),
+                        SizedBox(width: 8.0),
+                        Text('Modifier l\'affiche'),
+                      ],
+                    ),
+                  ),
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content:
-                              Text('L\'événement a été modifié avec succès !'),
+                  /*if (multiimages.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    Wrap(
+                      spacing: 8.0,
+                      runSpacing: 8.0,
+                      children: multiimages.map((imageFile) {
+                        return Container(
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: FileImage(imageFile),
+                              fit: BoxFit.cover,
                             ),
-                          );
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],*/
 
-                          Navigator.pop(context, true);
-                        } catch (error) {
-                                  print('La modification de l\'événement a échoué $error');
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                  'La modification de l\'événement a échoué. Veuillez réessayer !'),
-                            ),
-                          );
+              // ... display selected images ...
+                  ElevatedButton(
+                    onPressed: () async {
+                      setState(() {
+                        _isLoading = true; // Afficher le loader
+                      });
+                      if (_formKey.currentState!.validate()) {
+                        List<String> imageUrls = await uploadImagesToFirebase(multiimages);
+                        updateEventData(imageUrls);
+
+
+                        String? userId =
+                        AuthenticationService().getCurrentUserId();
+                        if (userId != null) {
+                          final collectionEvenementCree = FirebaseFirestore
+                              .instance
+                              .collection('User')
+                              .doc(userId)
+                              .collection('Evenement');
+
+                          print("id de event : ${editedEvent.id}");
+                          try {
+                            await collectionEvenementCree.doc(editedEvent.id).update({
+                              'evenementName': EvenementNameController.text,
+                              'organistorName': OrganistorNameController.text,
+                              'description': descriptionController.text,
+                              'ville': selectVille,
+                              'lieu': lieuController.text,
+                              'datetime': Timestamp.fromDate(selectedDateTime!),
+                              'imageUrls': imageUrls,
+                              'status': 'cree',
+                              'eventId': '',
+                              'registeredCount': 0,
+                              'registeredUsers': [],
+                              'organizerId': userId,
+                            });
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content:
+                                Text('L\'événement a été modifié avec succès !'),
+                              ),
+                            );
+
+                            Navigator.pop(context, true);
+                          } catch (error) {
+                                    print('La modification de l\'événement a échoué $error');
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                    'La modification de l\'événement a échoué. Veuillez réessayer !'),
+                              ),
+                            );
+                          }
+                      finally {
+                      setState(() {
+                        _isLoading = false; // Masquer le loader
+                      });
+                      }
                         }
                       }
-                    }
-                  },
-                  child: const Text(
-                    "ENREGISTRER",
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontFamily: 'Russo_One',
+                    },
+                    child: const Text(
+                      "ENREGISTRER",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontFamily: 'Russo_One',
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12,),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text(
-                    "ANNULER",
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontFamily: 'Russo_One',
+                  const SizedBox(width: 12,),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text(
+                      "ANNULER",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontFamily: 'Russo_One',
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
+     if (_isLoading)
+    Container(
+      color: Colors.black.withOpacity(0.5),
+      child: Center(
+        child: CircularProgressIndicator(),
       ),
+    ),
+    ]
+    ),
     );
   }
 }
