@@ -119,7 +119,7 @@ class _ApplicationInterfaceState extends State<ApplicationInterface> {
             const Accueil(),
             const PageEvenement(),
             EventCalendarPage(),
-            const Search()
+
           ],
         ),
         bottomNavigationBar: SalomonBottomBar(
