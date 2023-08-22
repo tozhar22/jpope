@@ -3,13 +3,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/Event.dart';
 import '../models/UserFireStore.dart';
-import 'ListePersonneInscrit.dart';
 
-
-class EventDetailsPage extends StatelessWidget {
+class EventDetailsForPeople extends StatelessWidget {
   final Event event;
 
-  const EventDetailsPage({required this.event});
+  const EventDetailsForPeople({required this.event});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +23,8 @@ class EventDetailsPage extends StatelessWidget {
             children: [
               CachedNetworkImage(
                 imageUrl: event.imageUrls[0],
-                placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                placeholder: (context, url) =>
+                const Center(child: CircularProgressIndicator()),
                 errorWidget: (context, url, error) => const Icon(Icons.error),
               ),
               const SizedBox(height: 16.0),
@@ -122,44 +121,28 @@ class EventDetailsPage extends StatelessWidget {
                   color: Colors.grey[900],
                 ),
               ),
-              const SizedBox(height: 8.0),
-              Card(
-                child: ListTile(
-                  leading: const Icon(Icons.group),
-                  title: const Text('Liste des personnes inscrites'),
-                  onTap: () async {
-                    List<UserInfo> userInfoList = await fetchUserInfo(event.registeredUsers);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => RegisteredUsersListPage(userInfoList: userInfoList),
-                      ),
-                    );
-                  },
-                ),
-              ),
             ],
           ),
         ),
       ),
     );
   }
+}
 
-  Future<List<UserInfo>> fetchUserInfo(List<String> userIds) async {
-    List<UserInfo> userInfos = [];
+Future<List<UserInfo>> fetchUserInfo(List<String> userIds) async {
+  List<UserInfo> userInfos = [];
 
-    for (String userId in userIds) {
-      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-          .collection('User')
-          .doc(userId)
-          .get();
+  for (String userId in userIds) {
+    DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+        .collection('User')
+        .doc(userId)
+        .get();
 
-      String username = userSnapshot['userName'];
-      String email = userSnapshot['mail'];
+    String username = userSnapshot['userName'];
+    String email = userSnapshot['mail'];
 
-      userInfos.add(UserInfo(userId: userId, username: username, email: email));
-    }
-
-    return userInfos;
+    userInfos.add(UserInfo(userId: userId, username: username, email: email));
   }
+
+  return userInfos;
 }

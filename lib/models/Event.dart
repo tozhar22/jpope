@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Event {
   final String id;
   final String evenementName;
-  final String organizerId; // Champ pour l'ID de l'utilisateur créateur
+  final String organizerId;
   final String organizerName;
   final String description;
   final String ville;
@@ -13,6 +13,7 @@ class Event {
   String status;
   int registeredCount;
   List<String> registeredUsers;
+  String qrData;
 
   Event({
     required this.id,
@@ -27,6 +28,7 @@ class Event {
     required this.status,
     required this.registeredCount,
     required this.registeredUsers,
+    required this.qrData,
   });
 
   factory Event.fromFirestore(String id, Map<String, dynamic> data) {
@@ -43,6 +45,7 @@ class Event {
       status: data.containsKey('status') ? data['status'] as String : '',
       registeredCount: data.containsKey('registeredCount') ? data['registeredCount'] as int : 0,
       registeredUsers: data.containsKey('registeredUsers') ? List<String>.from(data['registeredUsers']) : [],
+      qrData: data.containsKey('qrData') ? data['qrData'] as String : '',
     );
   }
 
@@ -59,6 +62,7 @@ class Event {
       'status': status,
       'registeredCount': registeredCount,
       'registeredUsers': registeredUsers,
+      'qrData': qrData,
     };
   }
 

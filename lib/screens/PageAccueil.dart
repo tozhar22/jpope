@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:jpope/screens/EventDetailsForPeople.dart';
 import '../models/Event.dart';
 import '../services/FirebaseAuthServices.dart';
 import 'Plus informations.dart';
@@ -88,7 +89,8 @@ class _AccueilState extends State<Accueil> with AutomaticKeepAliveClientMixin{
       await eventRef.update({
         'registeredUsers': FieldValue.arrayUnion([userId]),
       });
-
+      // Génération du QR Code
+      String qrData = "$userId|${event.id}|${event.evenementName}|${event.organizerName}";
       // Ajout des informations de l'événement à la sous-collection de l'utilisateur inscrit
       DocumentReference userEventRef = FirebaseFirestore.instance
           .collection('User')
@@ -104,6 +106,7 @@ class _AccueilState extends State<Accueil> with AutomaticKeepAliveClientMixin{
         'ville': event.ville,
         'lieu': event.lieu,
         'datetime': event.timestamp,
+        'qrData': qrData,
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -224,9 +227,15 @@ class _AccueilState extends State<Accueil> with AutomaticKeepAliveClientMixin{
               ),
               TextButton(
                 onPressed: () {
+                  /*
                   showDialog(
                     context: context,
                     builder: (context) => MoreInfoDialog(event: event),
+                  );
+                  */
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) =>EventDetailsForPeople(event: event,)),
                   );
                 },
                 child: Text('Plus d\'informations'),

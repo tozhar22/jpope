@@ -43,7 +43,7 @@ class NavBar extends StatelessWidget {
             ),
             onTap: () => null,
           ),
-          Divider(color: Colors.blueAccent),//
+          Divider(color: Colors.blueAccent),
           if (isAdmin)
             ListTile(
               leading: Icon(Icons.admin_panel_settings),
@@ -56,6 +56,7 @@ class NavBar extends StatelessWidget {
               },
             )
           ,
+          Divider(color: Colors.blueAccent),
           ListTile(
             leading: Icon(Icons.person_off_rounded),
             title: Text(
