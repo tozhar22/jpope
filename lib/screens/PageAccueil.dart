@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:jpope/screens/EventDetailsForPeople.dart';
+import 'package:jpope/screens/EventDetailsForAllPeople.dart';
 import '../models/Event.dart';
 import '../services/FirebaseAuthServices.dart';
 import 'Plus informations.dart';

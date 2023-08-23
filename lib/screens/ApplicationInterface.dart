@@ -8,6 +8,8 @@ import 'package:jpope/services/FirebaseAuthServices.dart';
 import 'package:jpope/widgets/NavBar.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
+import 'EvenementInscrit.dart';
+
 class ApplicationInterface extends StatefulWidget {
   ApplicationInterface({Key? key}) : super(key: key);
 
@@ -119,7 +121,7 @@ class _ApplicationInterfaceState extends State<ApplicationInterface> {
             const Accueil(),
             const PageEvenement(),
             EventCalendarPage(),
-
+            Agenda()
           ],
         ),
         bottomNavigationBar: SalomonBottomBar(
@@ -142,8 +144,8 @@ class _ApplicationInterfaceState extends State<ApplicationInterface> {
               selectedColor: Colors.blueAccent,
             ),
             SalomonBottomBarItem(
-              icon: Icon(Icons.search),
-              title: Text("Recherche"),
+              icon: Icon(Icons.library_books),
+              title: Text("Agenda"),
               selectedColor: Colors.blueAccent,
             ),
           ],

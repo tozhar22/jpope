@@ -36,7 +36,7 @@ class Event {
       id: id,
       evenementName: data['evenementName'],
       organizerId: data.containsKey('organizerId') ? data['organizerId'] as String : '',
-      organizerName: data.containsKey('organistorName') ? data['organistorName'] as String : '',
+      organizerName: data.containsKey('organizerName') ? data['organizerName'] as String : '',
       description: data.containsKey('description') ? data['description'] as String : '',
       ville: data.containsKey('ville') ? data['ville'] as String : '',
       lieu: data.containsKey('lieu') ? data['lieu'] as String : '',

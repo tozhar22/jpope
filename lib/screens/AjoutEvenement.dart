@@ -45,7 +45,7 @@ class _AddEventState extends State<AddEvent> with AutomaticKeepAliveClientMixin{
       String? userId = AuthenticationService().getCurrentUserId();
       final donneEvenement = {
         'evenementName': EvenementNameController.text,
-        'organistorName': OrganistorNameController.text,
+        'organizerName': OrganistorNameController.text,
         'description': descriptionController.text,
         'ville': selectVille,
         'lieu': lieuController.text,

@@ -1,15 +1,14 @@
-import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'package:jpope/screens/Qr-code.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../models/Event.dart';
-import '../models/UserFireStore.dart';
-import 'ListePersonneInscrit.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 
-
-class EventDetailsPage extends StatelessWidget {
+class DetailsEventInscrit extends StatelessWidget {
+  const DetailsEventInscrit({super.key, required this.event});
   final Event event;
 
-  const EventDetailsPage({required this.event});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +24,8 @@ class EventDetailsPage extends StatelessWidget {
             children: [
               CachedNetworkImage(
                 imageUrl: event.imageUrls[0],
-                placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                placeholder: (context, url) =>
+                const Center(child: CircularProgressIndicator()),
                 errorWidget: (context, url, error) => const Icon(Icons.error),
               ),
               const SizedBox(height: 16.0),
@@ -122,38 +122,24 @@ class EventDetailsPage extends StatelessWidget {
                   color: Colors.grey[900],
                 ),
               ),
-              const SizedBox(height: 8.0),
-              Row(
-                children: [
-                  Text(
-                    'Nombre de personne Inscrit :',
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.deepPurple,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    event.registeredCount.toString(),
-                    style: TextStyle(
-                      fontSize: 24,
-                      color: Colors.grey[900],
-                    ),
-                  ),
-                ],
+              SizedBox(height: 16.0),
+              Text(
+                'Votre QR Code:',
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepPurple,
+                ),
               ),
               const SizedBox(height: 8.0),
               Card(
                 child: ListTile(
-                  leading: const Icon(Icons.group),
-                  title: const Text('Liste des personnes inscrites'),
+                  title: Center(child: const Text('QR-CODE',style: TextStyle(fontWeight: FontWeight.bold),)),
                   onTap: () async {
-                    List<UserInfo> userInfoList = await fetchUserInfo(event.registeredUsers);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => RegisteredUsersListPage(userInfoList: userInfoList),
+                        builder: (context) => QRCodePage(event)
                       ),
                     );
                   },
@@ -165,22 +151,5 @@ class EventDetailsPage extends StatelessWidget {
       ),
     );
   }
-
-  Future<List<UserInfo>> fetchUserInfo(List<String> userIds) async {
-    List<UserInfo> userInfos = [];
-
-    for (String userId in userIds) {
-      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-          .collection('User')
-          .doc(userId)
-          .get();
-
-      String username = userSnapshot['userName'];
-      String email = userSnapshot['mail'];
-
-      userInfos.add(UserInfo(userId: userId, username: username, email: email));
-    }
-
-    return userInfos;
-  }
 }
+
