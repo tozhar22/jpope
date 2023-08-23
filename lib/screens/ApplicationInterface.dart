@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jpope/screens/PageAccueil.dart';
 import 'package:jpope/screens/PageEvenement.dart';
 import 'package:jpope/screens/PagePlaning.dart';
-import 'package:jpope/screens/PageRecherche.dart';
 import 'package:jpope/services/FirebaseAuthServices.dart';
 import 'package:jpope/widgets/NavBar.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';

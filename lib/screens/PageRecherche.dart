@@ -60,6 +60,7 @@ class _SearchState extends State<Search> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: Text("Rechercher un évenement créer"),),
       body: Column(
         children: [
           Padding(
