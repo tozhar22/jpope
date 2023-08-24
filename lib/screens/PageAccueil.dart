@@ -3,11 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jpope/screens/EventDetailsForAllPeople.dart';
 import '../models/Event.dart';
 import '../services/FirebaseAuthServices.dart';
-import 'Plus informations.dart';
+
 
 
 class Accueil extends StatefulWidget {
-  const Accueil({Key? key}) : super(key: key);
+  final bool isAdmin;
+  const Accueil({Key? key, required this.isAdmin}) : super(key: key);
 
   @override
   State<Accueil> createState() => _AccueilState();
@@ -17,6 +18,8 @@ class _AccueilState extends State<Accueil> with AutomaticKeepAliveClientMixin{
   late List<Event> publishedEvents = [];
   bool isLoading = true;
   bool get wantKeepAlive => true;
+  List<String> userIDs = [];
+  bool isProcessingAction = false;
   @override
   void initState() {
     super.initState();
@@ -36,10 +39,9 @@ class _AccueilState extends State<Accueil> with AutomaticKeepAliveClientMixin{
             .where('status', isEqualTo: 'Publier')
             .get();
 
-        List<Event> userPublishedEvents = eventSnapshot.docs
-            .map((doc) => Event.fromFirestore(
-            doc.id, doc.data() as Map<String, dynamic>))
-            .toList();
+        List<Event> userPublishedEvents = eventSnapshot.docs.map((doc) {
+          return Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>);
+        }).toList();
 
         allPublishedEvents.addAll(userPublishedEvents);
       }
@@ -170,7 +172,58 @@ class _AccueilState extends State<Accueil> with AutomaticKeepAliveClientMixin{
       );
     }
   }
+  // Méthode de déplublication pour admin
 
+  Future<void> _depublishEvent(Event event) async {
+    try {
+      setState(() {
+        isProcessingAction = true;
+      });
+
+      // Set the status of the event to 'Non publié'
+      await FirebaseFirestore.instance
+          .collection('User')
+          .doc(event.organizerId)
+          .collection('Evenement')
+          .doc(event.id)
+          .update({'status': 'cree'});
+
+      // Refresh the events
+      await _refreshEvents();
+    } catch (e) {
+      print('Erreur lors de la dépublication de l\'événement : $e');
+    } finally {
+      setState(() {
+        isProcessingAction = false;
+      });
+    }
+  }
+  // Méthode de suppression evenement pour admin
+
+  Future<void> _deleteEvent(Event event) async {
+    try {
+      setState(() {
+        isProcessingAction = true;
+      });
+
+      // Delete the event document
+      await FirebaseFirestore.instance
+          .collection('User')
+          .doc(event.organizerId)
+          .collection('Evenement')
+          .doc(event.id)
+          .delete();
+
+      // Refresh the events
+      await _refreshEvents();
+    } catch (e) {
+      print('Erreur lors de la suppression de l\'événement : $e');
+    } finally {
+      setState(() {
+        isProcessingAction = false;
+      });
+    }
+  }
   Widget buildEventCard(Event event) {
     return Card(
       margin: EdgeInsets.all(8),
@@ -240,6 +293,47 @@ class _AccueilState extends State<Accueil> with AutomaticKeepAliveClientMixin{
                 },
                 child: Text('Plus d\'informations'),
               ),
+              SizedBox(width: 15,),
+              if (widget.isAdmin)  // Show the dropdown menu only if the user is an admin
+                PopupMenuButton<String>(
+                  icon: Icon(Icons.arrow_drop_down, color: Color(0xFF2196F3)),
+                  onSelected: (String result) {
+                    // Handle the selected menu option
+                    if (result == 'Modifier') {
+                      // Navigate to the edit page
+                    } else if (result == 'Supprimer') {
+                      _deleteEvent(event);
+                    }
+                    else if (result == 'Depublier'){
+                      _depublishEvent(event);
+                    }
+                  },
+                  itemBuilder: (BuildContext context) {
+                    return [
+                      const PopupMenuItem<String>(
+                        value: 'Modifier',
+                        child: ListTile(
+                          leading: Icon(Icons.edit, color: Color(0xFF2196F3)),
+                          title: Text('Modifier'),
+                        ),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'Depublier',
+                        child: ListTile(
+                          leading: Icon( Icons.cancel, color: Colors.red),
+                          title: Text('Depublier'),
+                        ),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'Supprimer',
+                        child: ListTile(
+                          leading: Icon(Icons.delete, color:Colors.red),
+                          title: Text('Supprimer'),
+                        ),
+                      ),
+                    ];
+                  },
+                ),
             ],
           ),
         ],
@@ -257,22 +351,32 @@ class _AccueilState extends State<Accueil> with AutomaticKeepAliveClientMixin{
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: _refreshEvents,
-        child: isLoading // Vérifier l'état de chargement
-            ?Center(
-              child: CircularProgressIndicator(), // Afficher le loader
-            )
-            : ListView.builder(
+        child: Stack(
+          children: [
+            ListView.builder(
               itemCount: publishedEvents.length,
               itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                // Naviguer vers la page de détails de l'événement ici si nécessaire
+                return GestureDetector(
+                  onTap: () {
+                    // Naviguer vers la page de détails de l'événement ici si nécessaire
+                  },
+                  child: buildEventCard(publishedEvents[index]),
+                );
               },
-              child: buildEventCard(publishedEvents[index]),
-            );
-          },
+            ),
+            if (isLoading)
+              Center(
+                child: CircularProgressIndicator(), // Afficher le loader
+              ),
+            if (isProcessingAction)
+              Container(
+                color: Colors.black.withOpacity(0.5),
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+          ],
         ),
       ),
     );
-  }
-}
+  }}

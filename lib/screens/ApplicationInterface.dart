@@ -117,7 +117,7 @@ class _ApplicationInterfaceState extends State<ApplicationInterface> {
             }
           },
           children: [
-            const Accueil(),
+            Accueil(isAdmin: _isAdmin),
             const PageEvenement(),
             EventCalendarPage(),
             Agenda()
