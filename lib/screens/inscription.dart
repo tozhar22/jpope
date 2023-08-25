@@ -17,6 +17,7 @@ class Inscription extends StatefulWidget {
 class _InscriptionState extends State<Inscription> {
 
   final AuthenticationService _auth = AuthenticationService();
+  bool _obscurePassword = true; // Par défaut, le mot de passe est masqué
 
   final _formKey = GlobalKey<FormState>();
   final userNameController = TextEditingController();
@@ -90,6 +91,13 @@ class _InscriptionState extends State<Inscription> {
                     ),
                     contentPadding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
                   ),
+                  onChanged: (value) {
+                    // Supprimez les espaces au début et à la fin de l'entrée
+                    userNameController.text = value.trim();
+                    userNameController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: userNameController.text.length),
+                    );
+                  },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Complétez le texte";
@@ -109,6 +117,13 @@ class _InscriptionState extends State<Inscription> {
                       borderRadius: BorderRadius.circular(25.0),
                     ),
                   ),
+                  onChanged: (value) {
+                    // Supprimez les espaces au début et à la fin de l'entrée
+                    emailController.text = value.trim();
+                    emailController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: emailController.text.length),
+                    );
+                  },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Complétez le texte";
@@ -127,8 +142,23 @@ class _InscriptionState extends State<Inscription> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(25.0),
                     ),
+                    suffixIcon: InkWell(
+                      onTap: () {
+                        setState(() {
+                          // Inversez la visibilité du mot de passe
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                      child: Icon(
+                        _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                        color: _obscurePassword ? Colors.grey : Colors.blue,
+                      ),
+                    ),
                   ),
-                  obscureText: true, // Masquer le texte du mot de passe
+                  obscureText: _obscurePassword, // Utilisez cette variable pour déterminer si le mot de passe doit être masqué ou non
+                  onChanged: (value) {
+                    // Pas besoin de supprimer les espaces des mots de passe
+                  },
                   validator: (value) {
                     if (value == null || value.isEmpty || value.length < 6) {
                       return "Le mot de passe doit contenir au moins 6 caractères";
