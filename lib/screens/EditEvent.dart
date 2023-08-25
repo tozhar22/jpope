@@ -356,7 +356,7 @@ class _EditEventState extends State<EditEvent> {
                               'ville': selectVille,
                               'lieu': lieuController.text,
                               'datetime': Timestamp.fromDate(selectedDateTime!),
-                              'imageUrls':  imageUrls != null ? imageUrls : [currentImageUrls.first],
+                              'imageUrls':  imageUrls,
                               'status': 'cree',
                               'eventId': '',
                               'registeredCount': 0,
