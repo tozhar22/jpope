@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:jpope/screens/EditEvent.dart';
 import 'package:jpope/screens/EventDetailsForAllPeople.dart';
 import '../models/Event.dart';
 import '../services/FirebaseAuthServices.dart';
@@ -297,13 +298,18 @@ class _AccueilState extends State<Accueil> with AutomaticKeepAliveClientMixin{
                 child: Text('Plus d\'informations'),
               ),
               SizedBox(width: 15,),
-              if (widget.isAdmin)  // Show the dropdown menu only if the user is an admin
+              if (widget.isAdmin)
                 PopupMenuButton<String>(
                   icon: Icon(Icons.arrow_drop_down, color: Color(0xFF2196F3)),
                   onSelected: (String result) {
                     // Handle the selected menu option
                     if (result == 'Modifier') {
-                      // Navigate to the edit page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditEvent(event: event),
+                        ),
+                      );
                     } else if (result == 'Supprimer') {
                       _deleteEvent(event);
                     }
@@ -337,6 +343,7 @@ class _AccueilState extends State<Accueil> with AutomaticKeepAliveClientMixin{
                     ];
                   },
                 ),
+
             ],
           ),
         ],

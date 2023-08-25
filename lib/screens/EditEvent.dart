@@ -49,6 +49,7 @@ class _EditEventState extends State<EditEvent> {
           .collection('Evenement')
           .get();
 
+
       List<Event> fetchedEvents = eventSnapshot.docs.map((doc) =>
           Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>)).toList();
 
@@ -307,7 +308,17 @@ class _EditEventState extends State<EditEvent> {
                         SizedBox(width: 8.0),
                         Text('Modifier l\'affiche'),
                       ],
+
                     ),
+                  ),
+
+                  Column(
+                    children: [
+                      if (currentImageUrls.isNotEmpty)
+                        Image.network(currentImageUrls.first),
+                      const SizedBox(height: 10),
+                      // ... autres widgets ...
+                    ],
                   ),
 
 
@@ -319,6 +330,11 @@ class _EditEventState extends State<EditEvent> {
                       });
                       if (_formKey.currentState!.validate()) {
                         List<String> imageUrls = await uploadImagesToFirebase(multiimages);
+                        if (imageUrls.isEmpty) {
+                          imageUrls.add(currentImageUrls.first);
+                        } else {
+                          currentImageUrls.removeAt(0);
+                        }
                         updateEventData(imageUrls);
 
 
@@ -340,7 +356,7 @@ class _EditEventState extends State<EditEvent> {
                               'ville': selectVille,
                               'lieu': lieuController.text,
                               'datetime': Timestamp.fromDate(selectedDateTime!),
-                              'imageUrls': imageUrls,
+                              'imageUrls':  imageUrls != null ? imageUrls : [currentImageUrls.first],
                               'status': 'cree',
                               'eventId': '',
                               'registeredCount': 0,
