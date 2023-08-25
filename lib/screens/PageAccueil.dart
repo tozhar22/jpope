@@ -103,6 +103,8 @@ class _AccueilState extends State<Accueil> with AutomaticKeepAliveClientMixin{
       await userEventRef.set({
         'evenementName': event.evenementName,
         'organizerName': event.organizerName,
+        'organizerId': event.organizerId,
+        'eventId': event.id,
         'imageUrls': event.imageUrls,
         'description': event.description,
         'ville': event.ville,
@@ -122,6 +124,7 @@ class _AccueilState extends State<Accueil> with AutomaticKeepAliveClientMixin{
       );
     }
   }
+  // La desinscription sur cette page se base sur la liste event dans l'application
   void _EventDesinscription(Event event) async {
     try {
       String userId = AuthenticationService().getCurrentUserId();
@@ -226,7 +229,7 @@ class _AccueilState extends State<Accueil> with AutomaticKeepAliveClientMixin{
   }
   Widget buildEventCard(Event event) {
     return Card(
-      margin: EdgeInsets.all(8),
+      margin: EdgeInsets.all(10),
       elevation: 2,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

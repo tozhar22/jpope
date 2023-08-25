@@ -59,6 +59,7 @@ dependencies:
   share: ^2.0.4
   flutter_local_notifications: ^15.1.0+1
   qr_flutter: ^4.1.0
+  flutter_barcode_scanner: ^2.0.0
 
 
 
