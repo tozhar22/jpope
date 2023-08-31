@@ -63,15 +63,50 @@ class _EditEventState extends State<EditEvent> {
     }
   }
 
-  Future<void> multiImagePicker() async {
+  /*Future<void> multiImagePicker() async {
     final List<XFile> pickedImages = await _imagePicker.pickMultiImage();
     pickedImages.forEach((image) {
       multiimages.add(File(image.path));
     });
     setState(() {});
+  }*/
+  Future<void> _refreshEvents() async {
+    await fetchEvents();
+    setState(() {});
   }
 
-  Future<List<String>> uploadImagesToFirebase(List<File> images) async {
+  Future<void> multiImagePicker() async {
+    final List<XFile> pickedImages = await _imagePicker.pickMultiImage();
+
+    if (pickedImages.isNotEmpty) {
+      multiimages.clear(); // Clear the previous images
+      currentImageUrls.clear(); // Clear the previous image URLs
+
+      for (var image in pickedImages) {
+        multiimages.add(File(image.path));
+
+        String imageUrl = (await uploadImageToFirebase(image as File));
+        currentImageUrls.add(imageUrl); // Add the new image URL to currentImageUrls
+      }
+
+      setState(() {});
+      _refreshEvents();
+    }
+  }
+
+  Future<String> uploadImageToFirebase(File image) async {
+    String filename = DateTime.now().millisecondsSinceEpoch.toString();
+    Reference storageReference =
+    FirebaseStorage.instance.ref().child('event_images/$filename.jpg');
+
+    await storageReference.putFile(image);
+
+    String imageUrl = await storageReference.getDownloadURL();
+    return imageUrl;
+  }
+
+
+  /*Future<List<String>> uploadImagesToFirebase(List<File> images) async {
     List<String> imageUrls = [];
 
     for (var image in images) {
@@ -90,7 +125,7 @@ class _EditEventState extends State<EditEvent> {
     });
 
     return imageUrls;
-  }
+  }*/
 
   void loadEventData() {
     editedEvent = widget.event; // Initialize editedEvent with the event data
@@ -133,297 +168,340 @@ class _EditEventState extends State<EditEvent> {
     super.dispose();
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [SingleChildScrollView(
-          child: Container(
-            margin: EdgeInsets.all(30),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  const Text(
-                    "MODIFIER L'ÉVÉNEMENT",
-                    style: TextStyle(
-                      fontSize: 24,
-                      color: Color(0xFF2196F3),
-                      fontFamily: 'Russo_One',
-                    ),
-                  ),
-                  const SizedBox(height: 25,),
-                  TextFormField(
-                      decoration: const InputDecoration(
-                          labelText: "Nom de l'Evènement",
-                          hintText: "Saisir le nom de l'Evenement",
-                          border: OutlineInputBorder()
+      body: RefreshIndicator(
+        onRefresh: _refreshEvents,
+        child: Stack(
+            children: [SingleChildScrollView(
+              child: Container(
+                margin: EdgeInsets.all(30),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      const Text(
+                        "MODIFIER L'ÉVÉNEMENT",
+                        style: TextStyle(
+                          fontSize: 24,
+                          color: Color(0xFF2196F3),
+                          fontFamily: 'Russo_One',
+                        ),
                       ),
-                      controller: EvenementNameController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return ("Vous devez compléter ce champ");
-                        }
-                        return null;
-                      },
+                      const SizedBox(height: 25,),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                            labelText: "Nom de l'Evènement",
+                            hintText: "Saisir le nom de l'Evenement",
+                            border: OutlineInputBorder()
+                        ),
+                        controller: EvenementNameController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return ("Vous devez compléter ce champ");
+                          }
+                          return null;
+                        },
 
-                  ),
-                  const SizedBox(height: 25,),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                        labelText: "Organisateur",
-                        hintText: "Saisir le nom de l'organisateur",
-                        border: OutlineInputBorder()
-                    ),
-                    controller: OrganistorNameController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return ("Vous devez compléter ce champ");
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 25,),
-                  TextFormField(
-                    maxLines: 5,
-                    decoration: const InputDecoration(
-                      labelText: "Description de l'Événement",
-                      hintText: "Saisir la description de l'Événement",
-                      border: OutlineInputBorder(),
-                    ),
-                    controller: descriptionController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Vous devez compléter ce champ";
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 25,),
-                  DropdownButtonFormField<String>(
-                    items: const [
-                      DropdownMenuItem(value: 'Lome', child: Text("Lome")),
-                      DropdownMenuItem(value: 'Kara', child: Text("Kara")),
-                      DropdownMenuItem(value: 'Atakpamé', child: Text("Atakpamé")),
-                      DropdownMenuItem(value: 'Bassar', child: Text("Bassar")),
-                      DropdownMenuItem(value: 'Tsévié', child: Text("Tsévié")),
-                      DropdownMenuItem(value: 'Aného', child: Text("Aného")),
-                      DropdownMenuItem(value: 'Dapaong', child: Text("Dapaong")),
-                      DropdownMenuItem(value: 'Tchamba', child: Text("Tchamba")),
-                      DropdownMenuItem(value: 'Notsé', child: Text("Notsé")),
-                      DropdownMenuItem(value: 'Sotouboua', child: Text("Sotouboua")),
-                      DropdownMenuItem(value: 'Vogan', child: Text("Vogan")),
-                      DropdownMenuItem(value: 'Biankouri', child: Text("Biankouri")),
-                      DropdownMenuItem(value: 'Tabligbo', child: Text("Tabligbo")),
-                      DropdownMenuItem(value: 'Amlamé', child: Text("Amlamé")),
-                      DropdownMenuItem(value: 'Galangachi', child: Text("Galangachi")),
-                      DropdownMenuItem(value: 'Kpagouda', child: Text("Kpagouda")),
-                      DropdownMenuItem(value: 'Sokodé', child: Text("Sokodé")),
-                      DropdownMenuItem(value: 'Kpalimé', child: Text("Kpalimé")),
-                      DropdownMenuItem(value: 'Mango', child: Text("Mango")),
-                      DropdownMenuItem(value: 'Niamtougou', child: Text("Niamtougou")),
-                      DropdownMenuItem(value: 'Badou', child: Text("Badou")),
-                      DropdownMenuItem(value: 'Bafilo', child: Text("Bafilo")),
-                      DropdownMenuItem(value: 'Kandé', child: Text("Kandé")),
-                    ],
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                    ),
-                    value: selectVille,
-                    onChanged: (value) {
-                      setState(() {
-                        selectVille = value!;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 25,),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                        labelText: "Lieu",
-                        hintText: "Saisir le lieu de l'évènement",
-                        border: OutlineInputBorder()
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return ("Vous devez compléter ce champ");
-                      }
-                      return null;
-                    },
-                    controller: lieuController,
-                  ),
-                  const SizedBox(height: 25,),
-                  TextFormField(
-                    controller: TextEditingController(
-                      text: selectedDateTime != null
-                          ? DateFormat('yyyy-MM-dd HH:mm').format(selectedDateTime!)
-                          : '',
-                    ),
-                    readOnly: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Vous devez compléter ce champ";
-                      }
-                      return null;
-                    },
-                    onTap: () {
-                      showDatePicker(
-                        context: context,
-                        initialDate: selectedDateTime ?? DateTime.now(),
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2101),
-                      ).then((date) {
-                        if (date != null) {
-                          showTimePicker(
+                      ),
+                      const SizedBox(height: 25,),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                            labelText: "Organisateur",
+                            hintText: "Saisir le nom de l'organisateur",
+                            border: OutlineInputBorder()
+                        ),
+                        controller: OrganistorNameController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return ("Vous devez compléter ce champ");
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 25,),
+                      TextFormField(
+                        maxLines: 5,
+                        decoration: const InputDecoration(
+                          labelText: "Description de l'Événement",
+                          hintText: "Saisir la description de l'Événement",
+                          border: OutlineInputBorder(),
+                        ),
+                        controller: descriptionController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Vous devez compléter ce champ";
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 25,),
+                      DropdownButtonFormField<String>(
+                        items: const [
+                          DropdownMenuItem(value: 'Lome', child: Text("Lome")),
+                          DropdownMenuItem(value: 'Kara', child: Text("Kara")),
+                          DropdownMenuItem(value: 'Atakpamé', child: Text("Atakpamé")),
+                          DropdownMenuItem(value: 'Bassar', child: Text("Bassar")),
+                          DropdownMenuItem(value: 'Tsévié', child: Text("Tsévié")),
+                          DropdownMenuItem(value: 'Aného', child: Text("Aného")),
+                          DropdownMenuItem(value: 'Dapaong', child: Text("Dapaong")),
+                          DropdownMenuItem(value: 'Tchamba', child: Text("Tchamba")),
+                          DropdownMenuItem(value: 'Notsé', child: Text("Notsé")),
+                          DropdownMenuItem(value: 'Sotouboua', child: Text("Sotouboua")),
+                          DropdownMenuItem(value: 'Vogan', child: Text("Vogan")),
+                          DropdownMenuItem(value: 'Biankouri', child: Text("Biankouri")),
+                          DropdownMenuItem(value: 'Tabligbo', child: Text("Tabligbo")),
+                          DropdownMenuItem(value: 'Amlamé', child: Text("Amlamé")),
+                          DropdownMenuItem(value: 'Galangachi', child: Text("Galangachi")),
+                          DropdownMenuItem(value: 'Kpagouda', child: Text("Kpagouda")),
+                          DropdownMenuItem(value: 'Sokodé', child: Text("Sokodé")),
+                          DropdownMenuItem(value: 'Kpalimé', child: Text("Kpalimé")),
+                          DropdownMenuItem(value: 'Mango', child: Text("Mango")),
+                          DropdownMenuItem(value: 'Niamtougou', child: Text("Niamtougou")),
+                          DropdownMenuItem(value: 'Badou', child: Text("Badou")),
+                          DropdownMenuItem(value: 'Bafilo', child: Text("Bafilo")),
+                          DropdownMenuItem(value: 'Kandé', child: Text("Kandé")),
+                        ],
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                        ),
+                        value: selectVille,
+                        onChanged: (value) {
+                          setState(() {
+                            selectVille = value!;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 25,),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                            labelText: "Lieu",
+                            hintText: "Saisir le lieu de l'évènement",
+                            border: OutlineInputBorder()
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return ("Vous devez compléter ce champ");
+                          }
+                          return null;
+                        },
+                        controller: lieuController,
+                      ),
+                      const SizedBox(height: 25,),
+                      TextFormField(
+                        controller: TextEditingController(
+                          text: selectedDateTime != null
+                              ? DateFormat('yyyy-MM-dd HH:mm').format(selectedDateTime!)
+                              : '',
+                        ),
+                        readOnly: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Vous devez compléter ce champ";
+                          }
+                          return null;
+                        },
+                        onTap: () {
+                          showDatePicker(
                             context: context,
-                            initialTime: TimeOfDay.fromDateTime(selectedDateTime ?? DateTime.now()),
-                          ).then((time) {
-                            if (time != null) {
-                              setState(() {
-                                selectedDateTime = DateTime(
-                                  date.year,
-                                  date.month,
-                                  date.day,
-                                  time.hour,
-                                  time.minute,
-                                );
+                            initialDate: selectedDateTime ?? DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2101),
+                          ).then((date) {
+                            if (date != null) {
+                              showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay.fromDateTime(selectedDateTime ?? DateTime.now()),
+                              ).then((time) {
+                                if (time != null) {
+                                  setState(() {
+                                    selectedDateTime = DateTime(
+                                      date.year,
+                                      date.month,
+                                      date.day,
+                                      time.hour,
+                                      time.minute,
+                                    );
+                                  });
+                                }
                               });
                             }
                           });
-                        }
-                      });
-                    },
-                    decoration: const InputDecoration(
-                      labelText: "Date et Heure de evenement",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 25,),
-                  ElevatedButton(
-                    onPressed: () {
-                      multiImagePicker();
-                    },
-                    child: const Row(
-                      children: [
-                        Icon(Icons.photo),
-                        SizedBox(width: 8.0),
-                        Text('Modifier l\'affiche'),
-                      ],
+                        },
+                        decoration: const InputDecoration(
+                          labelText: "Date et Heure de evenement",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 25,),
+                      ElevatedButton(
+                        onPressed: () {
+                          multiImagePicker();
+                        },
+                        child: const Row(
+                          children: [
+                            Icon(Icons.photo),
+                            SizedBox(width: 8.0),
+                            Text('Modifier l\'affiche'),
+                          ],
 
-                    ),
-                  ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                        child: (multiimages.length == 1)
+                            ? Image.file(File(multiimages[0].path)) // Affiche la seule image en grand.
+                            : GridView.count(
+                          shrinkWrap: true,
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 2.5,
+                          mainAxisSpacing: 2.5,
+                          children: multiimages
+                              .map((e) => Image.file(File(e.path)))
+                              .toList(),
+                        ),
+                      ),
 
-                  Column(
-                    children: [
-                      if (currentImageUrls.isNotEmpty)
-                        Image.network(currentImageUrls.first),
-                      const SizedBox(height: 10),
-                      // ... autres widgets ...
+
+                      Column(
+                        children: [
+                          if (currentImageUrls.isNotEmpty)
+                            Image.network(currentImageUrls.first),
+                          const SizedBox(height: 10),
+                          // ... autres widgets ...
+                        ],
+                      ),
+
+
+                      // ... display selected images ...
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center, // Alignement horizontal au centre
+                        children:[ ElevatedButton(
+                          onPressed: () async {
+                            setState(() {
+                              _isLoading = true; // Afficher le loader
+                            });
+                            if (_formKey.currentState!.validate()) {
+                              String newImageUrl = "";
+
+                              if (multiimages.isNotEmpty) {
+                                newImageUrl = await uploadImageToFirebase(multiimages.first);
+                              }
+                              /*List<String> imageUrls = (await uploadImageToFirebase(multiimages as File)) as List<String>;
+                            if (imageUrls.isEmpty) {
+                              imageUrls.add(currentImageUrls.first);
+                            } else {
+                              currentImageUrls.removeAt(0);
+                            }
+                            updateEventData(imageUrls);*/
+
+
+                              String? userId =
+                              AuthenticationService().getCurrentUserId();
+                              if (userId != null) {
+                                final collectionEvenementCree = FirebaseFirestore
+                                    .instance
+                                    .collection('User')
+                                    .doc(userId)
+                                    .collection('Evenement');
+
+                                print("id de event : ${editedEvent.id}");
+                                List<String> updatedImageUrls = [...currentImageUrls];
+                                if (newImageUrl.isNotEmpty) {
+                                  updatedImageUrls.add(newImageUrl); // Ajouter la nouvelle URL
+                                }
+                                String newStatus = editedEvent.status; // Utilisez le statut actuel par défaut
+
+                                if (editedEvent.status == 'publier') {
+                                  newStatus = 'publier'; // Si le statut actuel était "publier", conservez-le
+                                } // Copie des URLs existantes
+                                try {
+                                  await collectionEvenementCree.doc(editedEvent.id).update({
+                                    'evenementName': EvenementNameController.text,
+                                    'organizerName': OrganistorNameController.text,
+                                    'description': descriptionController.text,
+                                    'ville': selectVille,
+                                    'lieu': lieuController.text,
+                                    'datetime': Timestamp.fromDate(selectedDateTime!),
+                                    'imageUrls': updatedImageUrls, //imageUrls,
+                                    'status': newStatus,
+                                    'eventId': editedEvent.id,
+                                    'registeredCount': editedEvent.registeredCount,
+                                    'registeredUsers': editedEvent.registeredUsers,
+                                    'organizerId': userId,
+                                  });
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content:
+                                      Text('L\'événement a été modifié avec succès !'),
+                                    ),
+                                  );
+
+                                  Navigator.pop(context, true);
+                                } catch (error) {
+                                  print('La modification de l\'événement a échoué $error');
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'La modification de l\'événement a échoué. Veuillez réessayer !'),
+                                    ),
+                                  );
+                                }
+                                finally {
+                                  setState(() {
+                                    _isLoading = false; // Masquer le loader
+                                  });
+                                }
+                              }
+                            }
+                          },
+
+                          child: const Text(
+                            "ENREGISTRER",
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontFamily: 'Russo_One',
+                            ),
+                          ),
+                        ),
+
+                          const SizedBox(width: 12), // Espacement entre les boutons
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.grey
+                            ),
+                            child: const Text(
+                              "ANNULER",
+                              style: TextStyle(
+                                color: Color(0xFF2196F3),
+                                fontSize: 15,
+                                fontFamily: 'Russo_One',
+                              ),
+                        ),
+                      ),
                     ],
                   ),
-
-
-              // ... display selected images ...
-                  ElevatedButton(
-                    onPressed: () async {
-                      setState(() {
-                        _isLoading = true; // Afficher le loader
-                      });
-                      if (_formKey.currentState!.validate()) {
-                        List<String> imageUrls = await uploadImagesToFirebase(multiimages);
-                        if (imageUrls.isEmpty) {
-                          imageUrls.add(currentImageUrls.first);
-                        } else {
-                          currentImageUrls.removeAt(0);
-                        }
-                        updateEventData(imageUrls);
-
-
-                        String? userId =
-                        AuthenticationService().getCurrentUserId();
-                        if (userId != null) {
-                          final collectionEvenementCree = FirebaseFirestore
-                              .instance
-                              .collection('User')
-                              .doc(userId)
-                              .collection('Evenement');
-
-                          print("id de event : ${editedEvent.id}");
-                          try {
-                            await collectionEvenementCree.doc(editedEvent.id).update({
-                              'evenementName': EvenementNameController.text,
-                              'organistorName': OrganistorNameController.text,
-                              'description': descriptionController.text,
-                              'ville': selectVille,
-                              'lieu': lieuController.text,
-                              'datetime': Timestamp.fromDate(selectedDateTime!),
-                              'imageUrls':  imageUrls,
-                              'status': 'cree',
-                              'eventId': '',
-                              'registeredCount': 0,
-                              'registeredUsers': [],
-                              'organizerId': userId,
-                            });
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content:
-                                Text('L\'événement a été modifié avec succès !'),
-                              ),
-                            );
-
-                            Navigator.pop(context, true);
-                          } catch (error) {
-                                    print('La modification de l\'événement a échoué $error');
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                    'La modification de l\'événement a échoué. Veuillez réessayer !'),
-                              ),
-                            );
-                          }
-                      finally {
-                      setState(() {
-                        _isLoading = false; // Masquer le loader
-                      });
-                      }
-                        }
-                      }
-                    },
-                    child: const Text(
-                      "ENREGISTRER",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontFamily: 'Russo_One',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12,),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text(
-                      "ANNULER",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontFamily: 'Russo_One',
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
+            ), if (_isLoading)
+                Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+            ]
         ),
-     if (_isLoading)
-    Container(
-      color: Colors.black.withOpacity(0.5),
-      child: Center(
-        child: CircularProgressIndicator(),
       ),
-    ),
-    ]
-    ),
     );
   }
 }

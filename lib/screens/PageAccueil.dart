@@ -4,6 +4,7 @@ import 'package:jpope/screens/EditEvent.dart';
 import 'package:jpope/screens/EventDetailsForAllPeople.dart';
 import '../models/Event.dart';
 import '../services/FirebaseAuthServices.dart';
+import 'AdminEdit.dart';
 
 
 
@@ -307,7 +308,7 @@ class _AccueilState extends State<Accueil> with AutomaticKeepAliveClientMixin{
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => EditEvent(event: event),
+                          builder: (context) => AdminEdit(event: event,),
                         ),
                       );
                     } else if (result == 'Supprimer') {
